@@ -359,15 +359,22 @@ import json
 from psycopg2.extras import Json
 import sys
 
-MODEL_NAME = "xlm-roberta-base"
-MAX_LENGTH = 128
+from preprocess    import preproceseaza_model
+from model_logic   import EmotionRegressor, incarca_model, scoruri_model, \
+                          EMOTII, MODEL_NAME, MAX_LENGTH, DEVICE
+from lexical_module import RoEmoLexModule
+
+
+#MODEL_NAME = "xlm-roberta-base"
+#MAX_LENGTH = 128
 BATCH_SIZE = 16
 EPOCHS     = 20
 LR         = 2e-5
-DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-EMOTII = ['Tristețe', 'Surpriză', 'Frică', 'Furie',
-          'Neutru', 'Încredere', 'Bucurie']
+#EMOTII = ['Tristețe', 'Surpriză', 'Frică', 'Furie',
+ #         'Neutru', 'Încredere', 'Bucurie']
+
 
 BASE_DIR   = Path(__file__).parent
 TRAIN_PATH = BASE_DIR / 'data_REDv2' / 'train.json'
@@ -483,9 +490,9 @@ def afiseaza_statistici():
         print("Eroare statistici:", e)
 
 
-def preproceseaza(text):
-    text = text.replace("<|PERSON|>", "persoana")
-    return text.strip()
+#def preproceseaza(text):
+ #   text = text.replace("<|PERSON|>", "persoana")
+  #  return text.strip()
 
 class REDv2Dataset(Dataset):
     def __init__(self, path, tokenizer):
@@ -498,7 +505,7 @@ class REDv2Dataset(Dataset):
 
     def __getitem__(self, index):
         exemplu  = self.data[index]
-        text     = preproceseaza(exemplu['text'])
+        text     = preproceseaza_model(exemplu['text'])
         labels   = torch.tensor(exemplu['procentual_labels'], dtype=torch.float32)
         encoding = self.tokenizer(
             text,
@@ -619,21 +626,21 @@ def evalueaza_test(tokenizer):
 
 
 def detecteaza_emotii(text, model, tokenizer, salveaza=True):  
-    model.eval()
-    encoding = tokenizer(
-        preproceseaza(text),
-        max_length=MAX_LENGTH,
-        truncation=True,
-        padding='max_length',
-        return_tensors='pt'
-    )
-    with torch.no_grad():
-        scoruri = model(
-            encoding['input_ids'].to(DEVICE),
-            encoding['attention_mask'].to(DEVICE)
-        ).cpu().numpy()[0]
+    # model.eval()
+    # encoding = tokenizer(
+    #     preproceseaza(text),
+    #     max_length=MAX_LENGTH,
+    #     truncation=True,
+    #     padding='max_length',
+    #     return_tensors='pt'
+    # )
+    # with torch.no_grad():
+    #     scoruri = model(
+    #         encoding['input_ids'].to(DEVICE),
+    #         encoding['attention_mask'].to(DEVICE)
+    #     ).cpu().numpy()[0]
 
-    rezultat         = {EMOTII[i]: float(scoruri[i]) for i in range(len(EMOTII))}
+    rezultat         = scoruri_model(text, model, tokenizer)  #{EMOTII[i]: float(scoruri[i]) for i in range(len(EMOTII))}
     rezultat_sortat  = sorted(rezultat.items(), key=lambda x: x[1], reverse=True)
     emotie_dominanta = rezultat_sortat[0][0]
     scor_dominant    = rezultat_sortat[0][1]  
@@ -689,11 +696,13 @@ if __name__ == '__main__':
     if skip_antrenare:
         print("Sar peste antrenare, incarc best_model_3.pt...")
         tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+        model, _  = incarca_model()
     else:
         print("=== ANTRENARE ===")
         tokenizer = antreneaza()
         print("\n=== EVALUARE TEST ===")
         evalueaza_test(tokenizer)
+        model, _  = incarca_model()
 
     model = EmotionRegressor().to(DEVICE)
     model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))

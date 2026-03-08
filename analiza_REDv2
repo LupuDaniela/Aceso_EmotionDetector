@@ -1,0 +1,81 @@
+import json
+import csv
+from pathlib import Path
+from collections import Counter
+
+BASE_DIR   = Path(__file__).parent
+TRAIN_PATH = BASE_DIR / 'data_REDv2' / 'train.json'
+VALID_PATH = BASE_DIR / 'data_REDv2' / 'valid.json'
+TEST_PATH  = BASE_DIR / 'data_REDv2' / 'test.json'
+POS_PATH   = BASE_DIR / 'lexicon' / 'RoEmoLex_V3_pos_sept2021.csv'
+
+EMOTII    = ['Tristețe', 'Surpriză', 'Frică', 'Furie',
+             'Neutru', 'Încredere', 'Bucurie']
+PRAG_ACTIV = 0.5
+
+
+def incarca_date():
+    date = []
+    for path in [TRAIN_PATH, VALID_PATH, TEST_PATH]:
+        with open(path, 'r', encoding='utf-8') as f:
+            date.extend(json.load(f))
+    return date
+
+
+def analiza_distributie(date):
+    contor = Counter()
+    for exemplu in date:
+        for i, scor in enumerate(exemplu['procentual_labels']):
+            if scor >= PRAG_ACTIV:
+                contor[EMOTII[i]] += 1
+
+    total = len(date)
+    print(f"\n{'='*55}")
+    print(f"DISTRIBUȚIE EMOȚII ÎN REDv2  (total: {total} exemple)")
+    print(f"{'='*55}")
+    for emotie in EMOTII:
+        count = contor[emotie]
+        pct   = count / total * 100
+        bara  = '█' * int(pct / 2)
+        print(f"  {emotie:12} [{count:4}]  {bara:<25} {pct:5.1f}%")
+    valori = [contor[e] for e in EMOTII]
+    print(f"\n  Max: {max(valori)}  Min: {min(valori)}  "
+          f"Raport: {max(valori)/max(min(valori),1):.1f}x")
+    print(f"{'='*55}\n")
+
+
+def analiza_acoperire_roemolex(date):
+    cuvinte_lex = set()
+    with open(POS_PATH, encoding='utf-8') as f:
+        reader = csv.DictReader(f, delimiter=';')
+        for row in reader:
+            cuvinte_lex.add(row['word'].strip().lower())
+
+    total_cuvinte  = 0
+    gasite_cuvinte = 0
+    texte_cu_match = 0
+
+    for exemplu in date:
+        cuvinte_text    = exemplu['text'].lower().split()
+        total_cuvinte  += len(cuvinte_text)
+        matches         = sum(1 for c in cuvinte_text if c in cuvinte_lex)
+        gasite_cuvinte += matches
+        if matches > 0:
+            texte_cu_match += 1
+
+    total = len(date)
+    print(f"{'='*55}")
+    print(f"ACOPERIRE RoEmoLex ASUPRA REDv2")
+    print(f"{'='*55}")
+    print(f"  Texte cu cel puțin un match: {texte_cu_match}/{total} "
+          f"({texte_cu_match/total*100:.1f}%)")
+    print(f"  Cuvinte găsite în lexicon:   {gasite_cuvinte}/{total_cuvinte} "
+          f"({gasite_cuvinte/total_cuvinte*100:.1f}%)")
+    print(f"{'='*55}\n")
+
+
+if __name__ == '__main__':
+    date = incarca_date()
+    print(f"Total exemple: {len(date)}")
+    analiza_distributie(date)
+    analiza_acoperire_roemolex(date)
