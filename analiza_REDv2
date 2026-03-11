@@ -31,7 +31,7 @@ def analiza_distributie(date):
 
     total = len(date)
     print(f"\n{'='*55}")
-    print(f"DISTRIBUȚIE EMOȚII ÎN REDv2  (total: {total} exemple)")
+    print(f"DISTRIBUTIE EMOTII IN REDv2  (total: {total} exemple)")
     print(f"{'='*55}")
     for emotie in EMOTII:
         count = contor[emotie]
@@ -67,9 +67,9 @@ def analiza_acoperire_roemolex(date):
     print(f"{'='*55}")
     print(f"ACOPERIRE RoEmoLex ASUPRA REDv2")
     print(f"{'='*55}")
-    print(f"  Texte cu cel puțin un match: {texte_cu_match}/{total} "
+    print(f"  Texte cu cel putin un match: {texte_cu_match}/{total} "
           f"({texte_cu_match/total*100:.1f}%)")
-    print(f"  Cuvinte găsite în lexicon:   {gasite_cuvinte}/{total_cuvinte} "
+    print(f"  Cuvinte gasite in lexicon:   {gasite_cuvinte}/{total_cuvinte} "
           f"({gasite_cuvinte/total_cuvinte*100:.1f}%)")
     print(f"{'='*55}\n")
 
