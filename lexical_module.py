@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 
-from preprocess import preproceseaza_lexical, elimina_diacritice
+from preprocess import preproceseaza_lexical, elimina_diacritice, nlp
 
 MAPARE_ROEMOLEX = {
     'Furie':      'Furie',
@@ -26,6 +26,8 @@ DIADE_PLUTCHIK = [
     ('Curiozitate',  'Surpriză',   'Încredere'),
     ('Disperare',    'Frică',      'Tristețe'),
     ('Invidie',      'Tristețe',   'Furie'),
+    ('Remușcare', 'Tristețe', 'Dezgust'),
+    ('Dispreț',   'Dezgust',  'Furie'),
 ]
 
 BASE_DIR  = Path(__file__).parent
@@ -54,6 +56,7 @@ class RoEmoLexModule:
         self._incarca_fisier(cale_expr, tip='expresie')
 
         self.ponderi_diade = self._calculeaza_ponderi_diade()
+
 
         print(f"RoEmoLex incarcat: {len(self.lexicon)} cuvinte + {len(self.expresii)} expresii")
 
@@ -118,6 +121,7 @@ class RoEmoLexModule:
             }
         return ponderi
 
+
     def afiseaza_ponderi(self):
         """
         Afiseaza in consola un tabel formatat cu ponderile diadelor Plutchik.
@@ -179,6 +183,18 @@ if __name__ == '__main__':
         "Mi-e frică și nu știu ce să fac.",
         "Sunt furioasă pe ce s-a întâmplat azi.",
         "Îmi amintesc cu drag de copilărie, dar nu mai pot reveni.",
+        "Abia aștept să mă duc la film",        # verb prezent
+        "Sper să reușesc la examen",            # verb prezent  
+        "Plănuiesc o vacanță în vară",          # verb prezent
+        "O să merg mâine la munte",             # viitor cu o să
+        "Voi merge săptămâna viitoare",         # viitor simplu
+        "Am nerăbdare să îl văd",               # substantiv
+        "Mi-e scârbă de ce a făcut",            # expresie directă
+        "E dezgustător comportamentul lui",     # adjectiv
+        "Nu suport minciuna",                   # verb indirect
+        "Îmi repugnă situația asta",            # verb direct
+        "Ce greață îmi face"                   # substantiv
+
     ]
     for text in teste:
         scoruri, gasite = modul.analizeaza(text)
