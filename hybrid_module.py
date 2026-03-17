@@ -9,7 +9,6 @@ from preprocess    import preproceseaza_model
 BASE_DIR   = Path(__file__).parent
 VALID_PATH = BASE_DIR / 'data_REDv2' / 'valid.json'
 
-# ── Emotii comune intre model si RoEmoLex ────────────────────────────────────
 # Modelul are 7 emotii, RoEmoLex are 8 — Anticipare si Dezgust lipsesc din model
 EMOTII_COMUNE  = ['Tristețe', 'Surpriză', 'Frică', 'Furie', 'Încredere', 'Bucurie']
 DOAR_LEXICAL   = ['Anticipare', 'Dezgust']   # absente din REDv2
@@ -24,7 +23,7 @@ def combina_scoruri(scor_model: dict, scor_lexical: dict, alpha: float) -> dict:
     Combina scorurile modelului neural si ale modulului lexical
     folosind formula de medie ponderata:
 
-        scor_final(e) = α × scor_model(e) + (1-α) × scor_lexical(e)
+        scor_final(e) = alpha x scor_model(e) + (1-alpha) x scor_lexical(e)
 
     Cazuri speciale:
         - Anticipare, Dezgust: absente din model → doar scor lexical
@@ -79,7 +78,7 @@ def calculeaza_mse_validare(model, tokenizer, modul_lexical: RoEmoLexModule,
     erori = []
     for exemplu in date_validare:
         text   = exemplu['text']
-        labels = exemplu['procentual_labels']   # [Tristețe, Surpriză, Frică, Furie, Neutru, Încredere, Bucurie]
+        labels = exemplu['procentual_labels']   
 
         sm, _ = scoruri_model_dict(text, model, tokenizer)
         sl, _ = modul_lexical.analizeaza(text)
@@ -143,8 +142,6 @@ def analizeaza_text(text: str, model, tokenizer,
                     modul_lexical: RoEmoLexModule,
                     alpha: float) -> dict:
     """
-    Pipeline complet Pasul 3 + Pasul 4 + Pasul 5 pentru un text.
-
     Returneaza scorurile finale combinate pentru toate 9 emotii.
     """
     sm      = scoruri_model(text, model, tokenizer)
@@ -160,10 +157,8 @@ if __name__ == '__main__':
     model, tokenizer = incarca_model()
     modul_lexical    = RoEmoLexModule()
 
-    # ── Ablation study ────────────────────────────────────────────────────────
     alpha_optim, rezultate_alpha = ablation_study(model, tokenizer, modul_lexical)
 
-    # ── Test pe exemple ───────────────────────────────────────────────────────
     teste = [
         "Sunt atât de fericită, nu-mi vine să cred!",
         "Mi-e frică și nu știu ce să fac.",

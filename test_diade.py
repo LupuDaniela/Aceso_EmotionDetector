@@ -1,6 +1,4 @@
 """
-test_diade.py
-─────────────
 Analizeaza frecventa de aparitie a tuturor celor 24 de diade Plutchik
 pe setul de test REDv2, folosind scorurile finale hibride (alpha=0.9).
 
@@ -22,7 +20,6 @@ TEST_PATH = BASE_DIR / 'data_REDv2' / 'test.json'
 ALPHA     = 0.9
 
 TOATE_DIADELE = [
-    # PRIMARE
     ('Iubire',         'Bucurie',    'Incredere',  'primara'),
     ('Supunere',       'Incredere',  'Frica',      'primara'),
     ('Teama',          'Frica',      'Surpriza',   'primara'),
@@ -31,7 +28,7 @@ TOATE_DIADELE = [
     ('Dispret',        'Dezgust',    'Furie',      'primara'),
     ('Agresivitate',   'Furie',      'Anticipare', 'primara'),
     ('Optimism',       'Anticipare', 'Bucurie',    'primara'),
-    # SECUNDARE
+    
     ('Vinovatie',      'Bucurie',    'Frica',      'secundara'),
     ('Curiozitate',    'Incredere',  'Surpriza',   'secundara'),
     ('Disperare',      'Frica',      'Tristete',   'secundara'),
@@ -40,7 +37,7 @@ TOATE_DIADELE = [
     ('Cinism',         'Dezgust',    'Anticipare', 'secundara'),
     ('Mandrie',        'Furie',      'Bucurie',    'secundara'),
     ('Speranta',       'Anticipare', 'Incredere',  'secundara'),
-    # TERTIARE
+    
     ('Incantare',      'Bucurie',    'Surpriza',   'tertiara'),
     ('Sentimentalism', 'Incredere',  'Tristete',   'tertiara'),
     ('Pudoare',        'Frica',      'Dezgust',    'tertiara'),
@@ -51,7 +48,6 @@ TOATE_DIADELE = [
     ('Anxietate',      'Anticipare', 'Frica',      'tertiara'),
 ]
 
-# mapare chei fara diacritice pentru potrivire cu scorurile din hybrid_module
 EMOTII_NORM = {
     'Încredere': 'Incredere', 'Frică': 'Frica',
     'Surpriză': 'Surpriza',   'Tristețe': 'Tristete',
@@ -106,7 +102,7 @@ def afiseaza_tabel(contor, scoruri_medii, total, prag):
 
 
 if __name__ == '__main__':
-    print("Incarc model si lexicon...")
+    print("Incarc model si lexicon")
     model, tokenizer = incarca_model()
     modul_lexical    = RoEmoLexModule()
 
@@ -114,7 +110,7 @@ if __name__ == '__main__':
         date_test = json.load(f)
     total = len(date_test)
 
-    print(f"Calculez scoruri finale pentru {total} exemple...")
+    print(f"Calculez scoruri finale pentru {total} exemple")
     scoruri_test = []
     for i, exemplu in enumerate(date_test):
         if (i + 1) % 100 == 0:
@@ -124,7 +120,7 @@ if __name__ == '__main__':
         )
         scoruri_test.append(normalizeaza_sf(sf))
 
-    print("\nAplic conditia dubla pentru praguri diferite...")
+    print("\nAplic conditia dubla pentru praguri diferite")
     rezultate_toate = {}
     for prag in [0.2, 0.3, 0.4, 0.5]:
         contor, scoruri_medii = analizeaza_cu_prag(scoruri_test, prag)
@@ -132,15 +128,14 @@ if __name__ == '__main__':
         afiseaza_tabel(contor, scoruri_medii, total, prag)
 
     print(f"\n{'='*60}")
-    print(f"SUMAR COMPARATIV")
-    print(f"{'='*60}")
+    print(f"REZULTATE COMPARATII")
     for prag in [0.2, 0.3, 0.4, 0.5]:
         contor, _ = rezultate_toate[prag]
         total_det    = sum(contor.values())
         diade_active = sum(1 for v in contor.values() if v > 0)
         print(f"  Prag {prag}: {total_det:5} detectii | {diade_active}/24 diade active")
 
-    print("\nSalveaza rezultate_diade.json...")
+    print("\nSalveaza rezultate_diade.json")
     export = {}
     for prag in [0.2, 0.3, 0.4, 0.5]:
         contor, scoruri_medii = rezultate_toate[prag]
@@ -151,4 +146,4 @@ if __name__ == '__main__':
         }
     with open(BASE_DIR / 'rezultate_diade.json', 'w', encoding='utf-8') as f:
         json.dump(export, f, ensure_ascii=False, indent=2)
-    print("Gata!")
+    

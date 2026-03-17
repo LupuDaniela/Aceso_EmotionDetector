@@ -1,7 +1,7 @@
 import unicodedata
 import spacy 
 
-nlp = spacy.load("ro_core_news_sm")
+nlp = spacy.load("ro_core_news_lg")
 
 def preproceseaza_model(text: str) -> str:
     """
