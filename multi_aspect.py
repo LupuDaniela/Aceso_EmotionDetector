@@ -92,8 +92,7 @@ def _extrage_aspect(sent) -> str:
     """
     Extrage termenul de aspect principal dintr-o clauza spaCy.
 
-    Implementeaza strategia de extragere din Ahmed et al. (2023):
-    relatiile de dependenta sintactica (nsubj, dobj) identifica
+    Relatiile de dependenta sintactica (nsubj, dobj) identifica
     termenii de aspect mai precis decat simpla selectie a primului substantiv.
 
     Prioritati:
