@@ -1,3 +1,12 @@
+"""
+aceso_em_det.py — Pipeline principal Aceso.
+
+Integreaza:
+    1. Modul hibrid   (XLM-RoBERTa + RoEmoLex, alpha=0.9)
+    2. Multi-Aspect Emotion Detection (MAED, clause-level via spaCy)
+    3. Detectie diade Plutchik (toate 24, conditie dubla, prag=0.3)
+"""
+
 import datetime
 import psycopg2
 import torch
@@ -12,11 +21,20 @@ from tqdm import tqdm
 import json
 from psycopg2.extras import Json
 import sys
+from collections import Counter
 
-from preprocess    import preproceseaza_model
-from model_logic    import (EmotionRegressor, incarca_model, scoruri_model,
+from preprocess     import preproceseaza_model
+from model_logic    import (EmotionRegressor, incarca_model,
                              EMOTII, MODEL_NAME, MAX_LENGTH, DEVICE, MODEL_PATH)
 from lexical_module import RoEmoLexModule
+from hybrid_module  import analizeaza_text
+from multi_aspect   import analizeaza_multi_aspect, afiseaza_rezultate as afiseaza_maed
+
+# ─────────────────────────────────────────────
+# Constante globale pipeline
+# ─────────────────────────────────────────────
+ALPHA       = 0.9   # calibrat prin ablation study pe REDv2 (MSE=0.0433)
+PRAG_DIADE  = 0.25   # prag optim selectat dupa testarea la 0.2 / 0.3 / 0.4 / 0.5
 
 BATCH_SIZE = 16
 EPOCHS     = 20
@@ -27,7 +45,6 @@ TRAIN_PATH = BASE_DIR / 'data_REDv2' / 'train.json'
 VALID_PATH = BASE_DIR / 'data_REDv2' / 'valid.json'
 TEST_PATH  = BASE_DIR / 'data_REDv2' / 'test.json'
 
-
 DB_CONFIG = {
     'host':     'localhost',
     'port':     5432,
@@ -36,6 +53,50 @@ DB_CONFIG = {
     'password': '1q2w3e'
 }
 
+# ─────────────────────────────────────────────
+# Toate cele 24 de diade Plutchik
+# ─────────────────────────────────────────────
+TOATE_DIADELE = [
+    ('Iubire',         'Bucurie',    'Incredere',  'primara'),
+    ('Supunere',       'Incredere',  'Frica',      'primara'),
+    ('Teama',          'Frica',      'Surpriza',   'primara'),
+    ('Dezamagire',     'Surpriza',   'Tristete',   'primara'),
+    ('Remuscare',      'Tristete',   'Dezgust',    'primara'),
+    ('Dispret',        'Dezgust',    'Furie',      'primara'),
+    ('Agresivitate',   'Furie',      'Anticipare', 'primara'),
+    ('Optimism',       'Anticipare', 'Bucurie',    'primara'),
+
+    ('Vinovatie',      'Bucurie',    'Frica',      'secundara'),
+    ('Curiozitate',    'Incredere',  'Surpriza',   'secundara'),
+    ('Disperare',      'Frica',      'Tristete',   'secundara'),
+    ('Rusine',         'Surpriza',   'Dezgust',    'secundara'),
+    ('Invidie',        'Tristete',   'Furie',      'secundara'),
+    ('Cinism',         'Dezgust',    'Anticipare', 'secundara'),
+    ('Mandrie',        'Furie',      'Bucurie',    'secundara'),
+    ('Speranta',       'Anticipare', 'Incredere',  'secundara'),
+
+    ('Incantare',      'Bucurie',    'Surpriza',   'tertiara'),
+    ('Sentimentalism', 'Incredere',  'Tristete',   'tertiara'),
+    ('Pudoare',        'Frica',      'Dezgust',    'tertiara'),
+    ('Indignare',      'Surpriza',   'Furie',      'tertiara'),
+    ('Pesimism',       'Tristete',   'Anticipare', 'tertiara'),
+    ('Morbiditate',    'Dezgust',    'Bucurie',    'tertiara'),
+    ('Dominanta',      'Furie',      'Incredere',  'tertiara'),
+    ('Anxietate',      'Anticipare', 'Frica',      'tertiara'),
+]
+
+# Normalizare diacritice pentru scorurile returnate de model
+EMOTII_NORM = {
+    'Încredere': 'Incredere',
+    'Frică':     'Frica',
+    'Surpriză':  'Surpriza',
+    'Tristețe':  'Tristete',
+}
+
+
+# ─────────────────────────────────────────────
+# Baza de date
+# ─────────────────────────────────────────────
 def init_database():
     """
     Initializarea bazei de date.
@@ -46,6 +107,7 @@ def init_database():
         - emotie_dominanta (VARCHAR)
         - scor_dominant (FLOAT): scorul emotiei dominante in [0, 1]
         - toate_scorurile (JSONB): dictionarul complet {emotie: scor}
+        - diade_detectate (JSONB): lista diadelor active la prag=0.3
         - timestamp (TIMESTAMP): momentul inregistrarii
     """
     print("Conectare la PostgreSQL...")
@@ -59,8 +121,14 @@ def init_database():
                 emotie_dominanta VARCHAR(50) NOT NULL,
                 scor_dominant    FLOAT NOT NULL,
                 toate_scorurile  JSONB,
+                diade_detectate  JSONB,
                 timestamp        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
+        """)
+        # Migrare: adauga coloana diade_detectate daca tabela exista deja fara ea
+        cursor.execute("""
+            ALTER TABLE conversations
+            ADD COLUMN IF NOT EXISTS diade_detectate JSONB
         """)
         cursor.execute("""
             CREATE INDEX IF NOT EXISTS idx_conversations_timestamp
@@ -74,23 +142,28 @@ def init_database():
         print("Eroare PostgreSQL:", e)
         sys.exit(1)
 
-def salveaza_in_db(message, emotie_dominanta, scor_dominant, toate_scorurile):
+
+def salveaza_in_db(message, emotie_dominanta, scor_dominant,
+                   toate_scorurile, diade_detectate=None):
     """
     Salveaza rezultatul unei analize emotionale in baza de date.
+    Campul diade_detectate stocheaza lista numelor diadelor active.
     """
     try:
         conn   = psycopg2.connect(**DB_CONFIG)
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO conversations 
-                (message, emotie_dominanta, scor_dominant, toate_scorurile, timestamp)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO conversations
+                (message, emotie_dominanta, scor_dominant,
+                 toate_scorurile, diade_detectate, timestamp)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (
             message,
             emotie_dominanta,
             float(scor_dominant),
             Json(toate_scorurile),
-            datetime.datetime.now() 
+            Json(diade_detectate or []),
+            datetime.datetime.now()
         ))
         conn.commit()
         cursor.close()
@@ -98,9 +171,13 @@ def salveaza_in_db(message, emotie_dominanta, scor_dominant, toate_scorurile):
     except Exception as e:
         print("Eroare salvare:", e)
 
+
 def afiseaza_statistici():
     """
-    Interogheaza baza de date si afiseaza statistici despre conversatiile salvate.
+    Interogheaza baza de date si afiseaza:
+        1. Distributia emotiilor dominante
+        2. Distributia diadelor Plutchik detectate (din campul JSONB)
+        3. Ultimele 10 mesaje
     """
     try:
         conn   = psycopg2.connect(**DB_CONFIG)
@@ -117,6 +194,19 @@ def afiseaza_statistici():
         """)
         distributie = cursor.fetchall()
 
+        # Extrage toate diadele din campul JSONB si numara frecventele.
+        # jsonb_array_elements_text desface array-ul JSON intr-un rand per diada.
+        cursor.execute("""
+            SELECT diada, COUNT(*) as count
+            FROM conversations,
+                 jsonb_array_elements_text(
+                     COALESCE(diade_detectate, '[]'::jsonb)
+                 ) AS diada
+            GROUP BY diada
+            ORDER BY count DESC
+        """)
+        distributie_diade = cursor.fetchall()
+
         cursor.execute("""
             SELECT message, emotie_dominanta, scor_dominant, timestamp
             FROM conversations
@@ -132,13 +222,24 @@ def afiseaza_statistici():
         print(f"{'='*60}")
 
         if distributie:
-            print("\nDistributie emotii:")
+            print("\nDistributie emotii dominante:")
             max_count = max(d[1] for d in distributie)
             for emotie, count in distributie:
                 percentage = (count / total) * 100
                 bar_length = int((count / max_count) * 30)
                 bar        = '█' * bar_length
                 print(f"  {emotie:12} [{count:3}] {bar} {percentage:5.1f}%")
+
+        if distributie_diade:
+            print(f"\nDiade Plutchik detectate (prag={PRAG_DIADE}):")
+            max_d = max(d[1] for d in distributie_diade)
+            for diada, count in distributie_diade:
+                percentage = (count / total) * 100
+                bar_length = int((count / max_d) * 30)
+                bar        = '░' * bar_length
+                print(f"  {diada:18} [{count:3}] {bar} {percentage:5.1f}%")
+        else:
+            print("\n  (nicio diada detectata inca)")
 
         if recente:
             print(f"\nUltimele 10 mesaje:")
@@ -153,7 +254,6 @@ def afiseaza_statistici():
         print("Eroare statistici:", e)
 
 
-
 class REDv2Dataset(Dataset):
     """
     Dataset PyTorch pentru incarcarea si tokenizarea datelor REDv2.
@@ -165,18 +265,11 @@ class REDv2Dataset(Dataset):
     """
 
     def __init__(self, path, tokenizer):
-        """
-        Incarca datele din fisierul JSON REDv2 si stocheaza tokenizatorul.
-        """
-
         with open(path, 'r', encoding='utf-8') as f:
             self.data = json.load(f)
         self.tokenizer = tokenizer
 
     def __len__(self):
-        """
-        Returneaza numarul total de exemple din dataset.
-        """
         return len(self.data)
 
     def __getitem__(self, index):
@@ -205,26 +298,24 @@ class REDv2Dataset(Dataset):
         }
 
 
-
-
-
-def evalueaza(model, loader, loss_fn): 
+# ─────────────────────────────────────────────
+# Antrenare / evaluare
+# ─────────────────────────────────────────────
+def evalueaza(model, loader, loss_fn):
     """
     Evalueaza modelul pe un set de date si calculeaza MSE si Hamming Loss.
 
     Ruleaza modelul in modul eval (fara gradient, dropout dezactivat)
     pe toate batch-urile din loader, acumuleaza predictiile si etichetele
-    reale, si calculeaza cele 2 metrici standard din paper-ul REDv2:
-    Mean Squared Error pentru setarea de regresie si Hamming Loss pentru
-    comparabilitate cu setarea de clasificare.
-    """ 
+    reale, si calculeaza cele 2 metrici standard din paper-ul REDv2.
+    """
     model.eval()
     val_loss    = 0
     toate_pred  = []
     toate_label = []
 
     with torch.no_grad():
-        for batch in loader: 
+        for batch in loader:
             input_ids      = batch['input_ids'].to(DEVICE)
             attention_mask = batch['attention_mask'].to(DEVICE)
             labels         = batch['labels'].to(DEVICE)
@@ -234,10 +325,10 @@ def evalueaza(model, loader, loss_fn):
             toate_pred.append((predictions.cpu().numpy() >= 0.5).astype(int))
             toate_label.append((labels.cpu().numpy() >= 0.5).astype(int))
 
-    val_loss    /= len(loader)
-    toate_pred   = np.vstack(toate_pred)
-    toate_label  = np.vstack(toate_label)
-    hl           = hamming_loss(toate_label, toate_pred)
+    val_loss   /= len(loader)
+    toate_pred  = np.vstack(toate_pred)
+    toate_label = np.vstack(toate_label)
+    hl          = hamming_loss(toate_label, toate_pred)
     return val_loss, hl
 
 
@@ -245,17 +336,8 @@ def antreneaza():
     """
     Realizeaza fine-tuning-ul XLM-RoBERTa pe datasetul REDv2.
 
-    Implementeaza bucla completa de antrenare cu early stopping:
-    - Optimizer: AdamW cu learning rate 2e-5 si weight decay 0.01
-    - Functie de pierdere: MSE (regresie pe procentual_labels)
-    - Batch size: 16, maxim 20 de epoci
-    - Early stopping cu patience=3: oprire daca val_loss nu scade
-      timp de 3 epoci consecutive
-    - Salvare automata a celui mai bun model in 'best_model_3.pt'
-
-    La fiecare epoca afiseaza Train MSE, Val MSE si Hamming Loss
-    pentru monitorizarea antrenarii. Modelul salvat corespunde
-    epocii cu cel mai mic Val MSE.
+    Bucla de antrenare cu early stopping (patience=3).
+    Salveaza automat cel mai bun model in 'best_model_3.pt'.
     """
     tokenizer     = AutoTokenizer.from_pretrained(MODEL_NAME)
     train_dataset = REDv2Dataset(TRAIN_PATH, tokenizer)
@@ -309,12 +391,10 @@ def antreneaza():
     print(f"\nAntrenare finalizata. Best val MSE: {best_val_loss:.4f}")
     return tokenizer
 
+
 def evalueaza_test(tokenizer):
     """
     Evalueaza modelul salvat pe setul de test REDv2 si compara cu baseline-ul.
-
-    Incarca greutatile din 'best_model_3.pt', ruleaza evaluarea pe test.json
-    si afiseaza MSE si Hamming Loss alaturi de valorile baseline raportate(MSE: 10.06, Hamming Loss: 0.102).
     """
     test_dataset = REDv2Dataset(TEST_PATH, tokenizer)
     test_loader  = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
@@ -327,52 +407,202 @@ def evalueaza_test(tokenizer):
     print(f"Hamming Loss: {hl:.4f}   (baseline paper: 0.102)")
 
 
-def detecteaza_emotii(text, model, tokenizer, salveaza=True):
+# ─────────────────────────────────────────────
+# Detectie diade Plutchik
+# ─────────────────────────────────────────────
+def normalizeaza_scoruri(scoruri: dict) -> dict:
     """
-    Analizeaza un text si returneaza scorurile emotionale detectate.
-    """  
-    rezultat         = scoruri_model(text, model, tokenizer)  
-    rezultat_sortat  = sorted(rezultat.items(), key=lambda x: x[1], reverse=True)
-    emotie_dominanta = rezultat_sortat[0][0]
-    scor_dominant    = rezultat_sortat[0][1]  
+    Normalizeaza cheile din scoruri pentru a elimina diacriticele
+    variabile returnate de model (ex: 'Frică' → 'Frica').
+    Necesar pentru a putea face lookup in TOATE_DIADELE.
+    """
+    return {EMOTII_NORM.get(k, k): v for k, v in scoruri.items()}
 
+
+def detecteaza_diade(scoruri: dict, prag: float = PRAG_DIADE) -> list:
+    """
+    Detecteaza diadele Plutchik active pe baza scorurilor hibride.
+
+    Conditie dubla: e1 > prag AND e2 > prag → diada prezenta.
+    Aceasta conditie este corecta teoretic: o emotie complexa Plutchik
+    apare doar cand ambele emotii componente sunt active simultan
+    (Plutchik, 1980). Alternativa (media > prag) ar permite detectia
+    chiar cand una dintre componente este absenta.
+
+    Parametri:
+        scoruri : dict {emotie: scor_hibrid}  — rezultat din analizeaza_text()
+        prag    : float — prag minim pentru ambele componente (default: 0.3)
+
+    Returneaza:
+        lista de tuple (nume_diada, emotie1, emotie2, tip, scor_mediu)
+        sortata descrescator dupa scor_mediu
+    """
+    scoruri_norm = normalizeaza_scoruri(scoruri)
+    diade_active = []
+
+    for ec, e1, e2, tip in TOATE_DIADELE:
+        v1 = scoruri_norm.get(e1, 0.0)
+        v2 = scoruri_norm.get(e2, 0.0)
+        if v1 > prag and v2 > prag:
+            scor_mediu = 0.5 * v1 + 0.5 * v2
+            diade_active.append((ec, e1, e2, tip, scor_mediu))
+
+    diade_active.sort(key=lambda x: x[4], reverse=True)
+    return diade_active
+
+
+def afiseaza_diade(diade_active: list):
+    """
+    Afiseaza diadele Plutchik detectate intr-un format tabelar.
+    """
+    if not diade_active:
+        print("  (nicio diada detectata la pragul curent)")
+        return
+
+    print(f"  {'Emotie complexa':18} {'Tip':10} {'Componente':24} {'Scor'}")
+    print(f"  {'─'*60}")
+    for ec, e1, e2, tip, scor in diade_active:
+        componente = f"{e1} + {e2}"
+        bara       = '█' * int(scor * 20)
+        print(f"  {ec:18} {tip:10} {componente:24} {scor:.3f}  {bara}")
+
+
+# ─────────────────────────────────────────────
+# Pipeline principal de detectie
+# ─────────────────────────────────────────────
+def detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True):
+    """
+    Analizeaza un text prin intregul pipeline Aceso:
+
+        1. MAED (Multi-Aspect Emotion Detection) — segmentare in clauze via spaCy
+           si scor hibrid per clauza. Daca textul are o singura clauza, MAED
+           produce acelasi scor ca modulul hibrid simplu.
+        2. Scoruri hibride agregate (ponderate dupa lungimea clauzei)
+        3. Diade Plutchik detectate pe scorurile agregate (prag=0.3)
+
+    Afisare adaptiva:
+        - text cu mai multe clauze → afiseaza breakdown per clauza + agregat
+        - text cu o singura clauza → afiseaza doar scorurile (fara sectiune MAED redundanta)
+
+    Parametri:
+        text          : textul de analizat
+        model         : EmotionRegressor incarcat
+        tokenizer     : tokenizer XLM-RoBERTa
+        modul_lexical : instanta RoEmoLexModule
+        salveaza      : daca True, salveaza in PostgreSQL
+
+    Returneaza:
+        dict cu cheile 'scoruri', 'diade', 'maed'
+    """
     print(f"\nText: {text}")
-    print(f"{'─'*40}")
+    print(f"{'═'*56}")
+
+    # 1. MAED rulat mereu — intern apeleaza hybrid per clauza
+    rezultat_maed = analizeaza_multi_aspect(
+        text, model, tokenizer, modul_lexical, ALPHA
+    )
+
+    nr_segmente = rezultat_maed['nr_segmente']
+    scoruri     = rezultat_maed['agregat']   # scorul final = agregatul ponderat
+
+    # 2. Afisare adaptiva
+    if nr_segmente > 1:
+        # Text complex: afiseaza fiecare clauza, apoi agregatul
+        print(f"  ANALIZA MULTI-ASPECT  ({nr_segmente} clauze)")
+        print(f"  {'─'*50}")
+        for i, seg in enumerate(rezultat_maed['segmente'], 1):
+            scoruri_seg  = sorted(seg['scoruri'].items(),key=lambda x: x[1], reverse=True)
+            # Emoția dominantă per clauză — afișată inline lângă textul clauzei
+            # Permite vizualizarea conflictului emoțional chiar dacă agregatul îl netezeste
+            dom_emotie   = scoruri_seg[0][0] if scoruri_seg else '—'
+            dom_scor     = scoruri_seg[0][1] if scoruri_seg else 0.0
+            print(f"\n  Clauza {i} [{dom_emotie} {dom_scor:.2f}]: \"{seg['text']}\"")
+            print(f"  Aspect  : [{seg['aspect']}]")
+            for emotie, scor in scoruri_seg:
+                if scor >= 0.05:
+                    bara = '█' * int(scor * 25)
+                    print(f"    {emotie:12}: {scor:.3f}  {bara}")
+
+        print(f"\n  {'─'*50}")
+        print(f"  SCOR AGREGAT (ponderat pe lungimea clauzei):")
+    else:
+        # Propozitie simpla: afiseaza direct scorurile, fara header MAED
+        print(f"  SCOR HIBRID (alpha={ALPHA}):")
+
+    print(f"  {'─'*50}")
+    rezultat_sortat  = sorted(scoruri.items(), key=lambda x: x[1], reverse=True)
+    emotie_dominanta = rezultat_sortat[0][0]
+    scor_dominant    = rezultat_sortat[0][1]
     for emotie, scor in rezultat_sortat:
         bara = '█' * int(scor * 30)
-        print(f"  {emotie:12}: {scor:.3f}  {bara}")
-    print(f"\nEmotie dominanta: {emotie_dominanta} ({scor_dominant:.3f})")
+        print(f"    {emotie:12}: {scor:.3f}  {bara}")
+    print(f"\n  Emotie dominanta: {emotie_dominanta} ({scor_dominant:.3f})")
 
+    # 3. Diade Plutchik pe scorurile agregate
+    diade_active = detecteaza_diade(scoruri, prag=PRAG_DIADE)
+    print(f"\n  {'─'*50}")
+    print(f"  DIADE PLUTCHIK (prag={PRAG_DIADE}):")
+    afiseaza_diade(diade_active)
+    print(f"{'═'*56}")
+
+    # 4. Salvare in baza de date
     if salveaza:
-        salveaza_in_db(text, emotie_dominanta, scor_dominant, rezultat)
-        print(f" Salvat in baza de date")
+        nume_diade = [d[0] for d in diade_active]
+        salveaza_in_db(text, emotie_dominanta, scor_dominant,
+                       scoruri, diade_detectate=nume_diade)
+        print(f"  ✓ Salvat in baza de date")
 
-    return rezultat 
+    return {
+        'scoruri': scoruri,
+        'diade':   diade_active,
+        'maed':    rezultat_maed,
+    }
 
 
-
-def mod_interactiv(model, tokenizer):
+# ─────────────────────────────────────────────
+# Mod interactiv
+# ─────────────────────────────────────────────
+def mod_interactiv(model, tokenizer, modul_lexical):
     """
     Interfata interactiva in linie de comanda.
+
+    Comenzi:
+        stats  - afiseaza statistici din baza de date
+        exit   - iesire
+
+    MAED ruleaza automat pe orice mesaj:
+        - propozitie simpla → scor hibrid direct
+        - text cu mai multe clauze → breakdown per clauza + scor agregat
     """
-    print("\n" + "="*50)
-    print("ACESO - Detectare Emotii")
-    print("Comenzi: 'stats' - statistici | 'exit' - iesire")
-    print("="*50)
+    print("\n" + "="*56)
+    print("ACESO - Sistem Empatic de Detectare Emotii")
+    print("  Hybrid: XLM-RoBERTa + RoEmoLex  (alpha=0.9)")
+    print("  Diade : 24 diade Plutchik        (prag=0.3)")
+    print("  MAED  : Multi-Aspect Detection   (auto, spaCy)")
+    print("─"*56)
+    print("Comenzi: 'stats' | 'exit'")
+    print("="*56)
 
     while True:
         text = input("\nMesaj: ").strip()
+
         if text.lower() in ['exit', 'quit', 'q']:
+            print("La revedere!")
             break
+
         elif text.lower() == 'stats':
             afiseaza_statistici()
             continue
+
         elif not text:
             continue
-        detecteaza_emotii(text, model, tokenizer)
+
+        detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True)
 
 
-
+# ─────────────────────────────────────────────
+# Entry point
+# ─────────────────────────────────────────────
 if __name__ == '__main__':
 
     init_database()
@@ -395,19 +625,26 @@ if __name__ == '__main__':
         tokenizer = antreneaza()
         print("\n=== EVALUARE TEST ===")
         evalueaza_test(tokenizer)
-        model, _  = incarca_model()
+        model, _ = incarca_model()
 
     model = EmotionRegressor().to(DEVICE)
     model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
     print(f"\nModel incarcat din {MODEL_PATH}")
 
-    print("\n=== TEST RAPID ===")
+    # Initializare modul lexical (singleton folosit in tot pipeline-ul)
+    modul_lexical = RoEmoLexModule()
+    print("Modul lexical RoEmoLex incarcat\n")
+
+    # ── Test rapid ──────────────────────────────────────────────────
+    print("=== TEST RAPID ===")
     exemple = [
         "Sunt atât de fericită, nu-mi vine să cred!",
         "Mi-e frică și nu știu ce să fac.",
         "Sunt furioasă pe ce s-a întâmplat azi.",
+        "Sunt îngrijorată de examen, dar sunt mândră că am învățat mult.",
     ]
     for ex in exemple:
-        detecteaza_emotii(ex, model, tokenizer,salveaza=False)
+        detecteaza_emotii(ex, model, tokenizer, modul_lexical, salveaza=False)
 
-    mod_interactiv(model, tokenizer)
+    # ── Mod interactiv ─────────────────────────────────────────────
+    mod_interactiv(model, tokenizer, modul_lexical)

@@ -63,136 +63,176 @@ def _curata_text_clauza(tokeni: list) -> tuple:
     """
     Elimina punctuatia si conjunctiile coordonatoare (dep_='cc')
     de la inceputul si sfarsitul unei clauze extrase din subtree.
-
+ 
     Necesar deoarece subtree-ul unui nod clauzal include si conjunctia
     si virgula care il preceda (ex: ', desi sunt obosit' → 'sunt obosit').
     Textul curat e trimis la model si la parserul de aspect pentru a
     evita zgomotul sintactic la capetele fragmentului.
-
+ 
     dep_='cc' (coordinating conjunction) este eticheta UD pentru
     conjunctii coordonatoare — eliminarea lor e independenta de limba,
     bazata exclusiv pe eticheta sintactica, nu pe forma cuvantului.
-
+ 
     Returneaza:
         text_curat   : str  — textul fara punctuatie/conjunctii la capete
         tokeni_valizi: list — tokenii fara spatii si punctuatie (pentru numarare)
     """
     while tokeni and (tokeni[0].is_punct or tokeni[0].dep_ == 'cc'):
         tokeni = tokeni[1:]
-
-    while tokeni and tokeni[-1].is_punct:
+ 
+    # Elimina de la SFARSIT: punctuatie, dep='cc' si POS='CCONJ'.
+    # spaCy eticheteaza uneori 'si'/'dar' ca CCONJ fara dep_='cc',
+    # deci verificam ambele etichete pentru acoperire completa.
+    while tokeni and (tokeni[-1].is_punct
+                      or tokeni[-1].dep_ == 'cc'
+                      or tokeni[-1].pos_ == 'CCONJ'):
         tokeni = tokeni[:-1]
-
+ 
     tokeni_valizi = [t for t in tokeni if not t.is_space and not t.is_punct]
     text_curat    = ' '.join(t.text for t in tokeni).strip()
     return text_curat, tokeni_valizi
+  
 
 
 def _extrage_aspect(sent) -> str:
     """
     Extrage termenul de aspect principal dintr-o clauza spaCy.
-
-    Relatiile de dependenta sintactica (nsubj, dobj) identifica
+ 
+    Implementeaza strategia de extragere din Ahmed et al. (2023):
+    relatiile de dependenta sintactica (nsubj, dobj) identifica
     termenii de aspect mai precis decat simpla selectie a primului substantiv.
-
+ 
     Prioritati:
         1. Token cu dep_='nsubj' si POS NOUN/PROPN, ne-stopword
         2. Token cu dep_='dobj', ne-stopword
         3. Token ROOT care e substantiv sau verb cu continut
         4. Primul substantiv ne-stopword
-        5. Fallback: primele 3 cuvinte ne-spatiu
+        5. Fallback: primul token cu continut lexical (exclude AUX, PRON, DET)
     """
     for token in sent:
         if (token.dep_ == 'nsubj'
                 and token.pos_ in ('NOUN', 'PROPN')
                 and not token.is_stop):
             return token.lemma_.lower()
-
+ 
     for token in sent:
         if token.dep_ == 'dobj' and not token.is_stop:
             return token.lemma_.lower()
-
+ 
     for token in sent:
         if token.dep_ == 'ROOT' and token.pos_ in ('NOUN', 'PROPN', 'VERB'):
             return token.lemma_.lower()
-
+ 
     for token in sent:
         if (token.pos_ in ('NOUN', 'PROPN')
                 and not token.is_stop
                 and not token.is_punct):
             return token.lemma_.lower()
-
-    cuvinte = [t.text for t in sent if not t.is_space and not t.is_punct][:3]
-    return ' '.join(cuvinte) if cuvinte else '—'
+ 
+    POS_EXCLUSE = {'AUX', 'PRON', 'DET', 'PART', 'CCONJ', 'SCONJ', 'ADP', 'PUNCT'}
+    for token in sent:
+        if (token.pos_ not in POS_EXCLUSE
+                and not token.is_space
+                and not token.is_punct
+                and not token.is_stop
+                and len(token.text) > 1):
+            return token.lemma_.lower()
+    return '—'
+ 
+def _extrage_clauze_din_nod(nod, sent_tokens: list, nlp_instance) -> list:
+    """
+    Extrage recursiv clauzele din subtree-ul unui nod.
+ 
+    Versiunea anterioara procesa doar nodurile clauzale directe de ROOT
+    (conditia t.head == root), ratand clauzele imbricate:
+ 
+        "sunt fericit, dar afara ploua si imi scade cheful"
+         ROOT=mancat
+           conj: sunt        <- nivel 1, prins
+             conj: ploua     <- nivel 2, ignorat anterior
+               conj: scade   <- nivel 3, ignorat anterior
+ 
+    Recursivitatea rezolva: pentru fiecare nod clauzal procesam
+    la randul sau sub-nodurile sale clauzale.
+ 
+    Returneaza lista de tuple (text_curat, nr_tokeni, span_obj).
+    """
+    noduri_directe = [
+        t for t in sent_tokens
+        if t.dep_ in TIPURI_CLAUZE and t.head == nod
+    ]
+ 
+    clauze = []
+ 
+    if not noduri_directe:
+        subtree_tok  = sorted(nod.subtree, key=lambda t: t.i)
+        text_c, tv_c = _curata_text_clauza(subtree_tok)
+        if len(tv_c) >= 2:
+            sub_doc = nlp_instance(text_c)
+            clauze.append((text_c, len(tv_c), sub_doc[:]))
+        return clauze
+ 
+    tokeni_sub = {t.i for nd in noduri_directe for t in nd.subtree}
+    proprii    = [t for t in nod.subtree if t.i not in tokeni_sub]
+    text_p, tv = _curata_text_clauza(proprii)
+    if len(tv) >= 2:
+        sub_doc = nlp_instance(text_p)
+        clauze.append((text_p, len(tv), sub_doc[:]))
+ 
+    for nd in sorted(noduri_directe, key=lambda t: t.i):
+        clauze.extend(_extrage_clauze_din_nod(nd, sent_tokens, nlp_instance))
+ 
+    return clauze
 
 
 def _segmenteaza_clauze(text: str) -> list:
     """
     Segmenteaza textul in clauze folosind subtree-urile nodurilor clauzale
     din arborele de dependente spaCy (Universal Dependencies).
-
-    Strategia: subtree-based pe TIPURI_CLAUZE = {conj, advcl, parataxis}
-        - ROOT + dependentii sai care nu sunt in TIPURI_CLAUZE = prima clauza
-        - fiecare nod din TIPURI_CLAUZE + subtree-ul sau = clauza separata
-
-    Fata de versiunea anterioara (doar 'conj'), extinderea la
-    parataxis rezolva cazul neacoperite:
-
-        parataxis: "Am castigat, sunt mandru, dar sunt si obosit"
-               INAINTE → fallback pe virgula (imprecis)
-               ACUM    → detectat structural prin arborele de dependente
-
-    Fallback eliminat: ro_core_news_lg detecteaza corect parataxis in
-    majoritatea cazurilor unde versiunea sm esua si necesita fallback
-    pe virgula. Eliminarea fallback-ului evita segmentarile gresite pe
-    virgule non-clauzale (enumerari, apozitii, intercalari).
-
-    Filtru minim 3 tokeni valizi: segmentele prea scurte nu au context
-    suficient pentru detectia emotionala si sunt ignorate.
-
-    Returneaza lista de tuple:
-        (text_curat: str, nr_tokeni_valizi: int, sent_obj: spaCy Span)
+ 
+    Strategia: subtree-based RECURSIV pe TIPURI_CLAUZE = {conj, parataxis}.
+    Segmentarea e strict sintactica — nu se face distinctie intre conj
+    aditionale ("si") si adversative ("dar"), conform abordarii standard
+    din literatura ABSA (Xia & Ding, ACL 2019).
+ 
+    Limitare documentata: ro_core_news_lg poate eticheta incorect unele
+    conjunctii coordonatoare, lasand artefacte la capetele clauzelor.
+    Curatarea se bazeaza exclusiv pe etichetele UD (dep=cc, pos=CCONJ),
+    fara hardcodarea formelor lexicale.
+ 
+    Filtru minim 2 tokeni valizi.
     """
     doc    = nlp(preproceseaza_model(text))
     clauze = []
-
+ 
     for sent in doc.sents:
         root = next((t for t in sent if t.dep_ == 'ROOT'), None)
         if root is None:
             continue
-
-        # Noduri clauzale care atarna DIRECT de ROOT.
-        # Conditia t.head == root exclude clauzele imbricate
-        noduri_clauzale = [
-            t for t in sent
+ 
+        sent_tokens    = list(sent)
+        noduri_directe = [
+            t for t in sent_tokens
             if t.dep_ in TIPURI_CLAUZE and t.head == root
         ]
-
-        if not noduri_clauzale:
-            tokeni_sent  = list(sent)
-            text_s, tv_s = _curata_text_clauza(tokeni_sent)
-            if len(tv_s) >= 3:
+ 
+        if not noduri_directe:
+            text_s, tv_s = _curata_text_clauza(sent_tokens)
+            if len(tv_s) >= 2:
                 sub_doc = nlp(text_s)
                 clauze.append((text_s, len(tv_s), sub_doc[:]))
             continue
-
-        # Prima clauza: ROOT + dependentii sai care NU sunt in subtree-urile nodurilor clauzale.
-        tokeni_sub = {t.i for nod in noduri_clauzale for t in nod.subtree}
-        prima      = [t for t in sent if t.i not in tokeni_sub]
+ 
+        tokeni_sub = {t.i for nd in noduri_directe for t in nd.subtree}
+        prima      = [t for t in sent_tokens if t.i not in tokeni_sub]
         text_p, tv = _curata_text_clauza(prima)
-        if len(tv) >= 3:
+        if len(tv) >= 2:
             sub_doc = nlp(text_p)
             clauze.append((text_p, len(tv), sub_doc[:]))
-
-        # Clauzele secundare: fiecare nod clauzal + subtree-ul sau curatat.
-        # Sortarea dupa t.i pastreaza ordinea originala din fraza.
-        for nod in noduri_clauzale:
-            subtree_tok  = sorted(nod.subtree, key=lambda t: t.i)
-            text_c, tv_c = _curata_text_clauza(subtree_tok)
-            if len(tv_c) >= 3:
-                sub_doc = nlp(text_c)
-                clauze.append((text_c, len(tv_c), sub_doc[:]))
-
+ 
+        for nd in sorted(noduri_directe, key=lambda t: t.i):
+            clauze.extend(_extrage_clauze_din_nod(nd, sent_tokens, nlp))
+ 
     return clauze
 
 
