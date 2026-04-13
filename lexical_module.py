@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 
-from preprocess import preproceseaza_lexical, elimina_diacritice, nlp
+from preprocess import preproceseaza_lexical, elimina_diacritice, detecteaza_leme_negate, nlp
 
 MAPARE_ROEMOLEX = {
     'Furie':      'Furie',
@@ -13,6 +13,8 @@ MAPARE_ROEMOLEX = {
     'Surpriza':   'Surpriză',
     'Incredere':  'Încredere',
 }
+
+FACTOR_NEGATIE_LEXICAL = 0.1
 
 EMOTII_ROEMOLEX = list(MAPARE_ROEMOLEX.values())
 
@@ -136,25 +138,20 @@ class RoEmoLexModule:
 
     def analizeaza(self, text: str) -> tuple:
         """
-        Analizeaza un text si returneaza scorurile emotionale lexicale.
-
-        Implementeaza strategia de cautare in trei niveluri pentru a maximiza
-        acoperirea lexicala:
-        1. Cautare expresii multi-cuvant (subsir în textul normalizat)
-        2. Cautare leme individuale cu diacritice in self.lexicon
-        3. Fallback: cautare leme fara diacritice (pentru texte fara semne)
-
-        Scorurile sunt calculate ca medie aritmetica a scorurilor tuturor
-        termenilor identificati, asigurand invarianta fata de lungimea textului.
+        Cuvintele aflate in scope-ul negatie (relatie UD 'neg') contribuie cu
+        FACTOR_NEGATIE_LEXICAL in loc de valoarea integrala — negarea reduce
+        intensitatea, nu inverseaza emotia (Hogenboom et al., 2011).
         """
         text_norm, leme = preproceseaza_lexical(text)
+        leme_negate     = detecteaza_leme_negate(text)
         acumulat = {e: 0 for e in EMOTII_ROEMOLEX}
         gasite   = 0
 
         for expresie, scoruri_expr in self.expresii.items():
             if expresie in text_norm:
+                factor = FACTOR_NEGATIE_LEXICAL if expresie in leme_negate else 1.0
                 for emotie in EMOTII_ROEMOLEX:
-                    acumulat[emotie] += scoruri_expr.get(emotie, 0)
+                    acumulat[emotie] += scoruri_expr.get(emotie, 0) * factor
                 gasite += 1
 
         for lema in leme:
@@ -162,8 +159,9 @@ class RoEmoLexModule:
             if intrare is None:
                 intrare = self.lexicon.get(elimina_diacritice(lema))
             if intrare:
+                factor = FACTOR_NEGATIE_LEXICAL if lema in leme_negate else 1.0
                 for emotie in EMOTII_ROEMOLEX:
-                    acumulat[emotie] += intrare.get(emotie, 0)
+                    acumulat[emotie] += intrare.get(emotie, 0) * factor
                 gasite += 1
 
         scoruri_finale = (

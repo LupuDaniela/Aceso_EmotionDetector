@@ -4,7 +4,7 @@ from pathlib import Path
 
 from model_logic   import scoruri_model, incarca_model, EMOTII
 from lexical_module import RoEmoLexModule, EMOTII_ROEMOLEX
-from preprocess    import preproceseaza_model
+from preprocess    import detecteaza_leme_negate, elimina_diacritice
 
 BASE_DIR   = Path(__file__).parent
 VALID_PATH = BASE_DIR / 'data_REDv2' / 'valid.json'
@@ -16,6 +16,8 @@ DOAR_MODEL     = ['Neutru']                   # absent din RoEmoLex
 
 # mapare nume emotii model → nume emotii RoEmoLex (identice, dar verificam)
 MAPARE_COMUNE = {e: e for e in EMOTII_COMUNE}
+
+FACTOR_NEGATIE_HIBRID = 0.2
 
 
 def combina_scoruri(scor_model: dict, scor_lexical: dict, alpha: float) -> dict:
@@ -55,6 +57,38 @@ def combina_scoruri(scor_model: dict, scor_lexical: dict, alpha: float) -> dict:
 
     return scor_final
 
+def aplica_corectie_negatie(text: str, scoruri: dict,
+                            modul_lexical: RoEmoLexModule) -> dict:
+    """
+    Corecteaza scorurile hibride finale pentru emotiile ale caror cuvinte-cheie
+    sunt negate in text.
+
+    1. Detecteaza lemele negate prin relatia UD 'neg' (Nivre et al., 2016).
+    2. Cauta in RoEmoLex ce emotii contribuie acele leme.
+    3. Aplica FACTOR_NEGATIE_HIBRID — modelul neural nu gestioneaza negatia
+       (limitare documentata), aceasta corectie compenseaza partial deficitul.
+    """
+    leme_negate = detecteaza_leme_negate(text)
+    if not leme_negate:
+        return scoruri
+
+    emotii_negate = set()
+    for lema in leme_negate:
+        intrare = (modul_lexical.lexicon.get(lema)
+                   or modul_lexical.lexicon.get(elimina_diacritice(lema)))
+        if intrare:
+            for emotie, scor in intrare.items():
+                if scor > 0:
+                    emotii_negate.add(emotie)
+
+    if not emotii_negate:
+        return scoruri
+
+    scoruri_corectate = dict(scoruri)
+    for emotie in emotii_negate:
+        if emotie in scoruri_corectate:
+            scoruri_corectate[emotie] *= FACTOR_NEGATIE_HIBRID
+    return scoruri_corectate
 
 def calculeaza_mse_validare(model, tokenizer, modul_lexical: RoEmoLexModule,
                              alpha: float) -> float:
@@ -140,13 +174,13 @@ def ablation_study(model, tokenizer, modul_lexical: RoEmoLexModule,
 
 def analizeaza_text(text: str, model, tokenizer,
                     modul_lexical: RoEmoLexModule,
-                    alpha: float) -> dict:
-    """
-    Returneaza scorurile finale combinate pentru toate 9 emotii.
-    """
-    sm      = scoruri_model(text, model, tokenizer)
-    sl, _   = modul_lexical.analizeaza(text)
-    sf      = combina_scoruri(sm, sl, alpha)
+                    alpha: float,
+                    corecteaza_negatie: bool = True) -> dict:
+    sm = scoruri_model(text, model, tokenizer)
+    sl, _ = modul_lexical.analizeaza(text)
+    sf = combina_scoruri(sm, sl, alpha)
+    if corecteaza_negatie:
+        sf = aplica_corectie_negatie(text, sf, modul_lexical)
     return sf
 
 

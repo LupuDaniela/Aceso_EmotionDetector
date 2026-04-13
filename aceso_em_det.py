@@ -10,6 +10,7 @@ Integreaza:
 import datetime
 import psycopg2
 import torch
+import os
 import numpy as np
 from pathlib import Path
 from torch import nn
@@ -22,6 +23,7 @@ import json
 from psycopg2.extras import Json
 import sys
 from collections import Counter
+from dotenv import load_dotenv
 
 from preprocess     import preproceseaza_model
 from model_logic    import (EmotionRegressor, incarca_model,
@@ -45,17 +47,17 @@ TRAIN_PATH = BASE_DIR / 'data_REDv2' / 'train.json'
 VALID_PATH = BASE_DIR / 'data_REDv2' / 'valid.json'
 TEST_PATH  = BASE_DIR / 'data_REDv2' / 'test.json'
 
+
+load_dotenv()
+
 DB_CONFIG = {
-    'host':     'localhost',
-    'port':     5432,
-    'database': 'emotion_db',
-    'user':     'postgres',
-    'password': '1q2w3e'
+    'host':     os.getenv('DB_HOST', 'localhost'),
+    'port':     int(os.getenv('DB_PORT', 5432)),
+    'database': os.getenv('DB_NAME', 'emotion_db'),
+    'user':     os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASSWORD', ''),
 }
 
-# ─────────────────────────────────────────────
-# Toate cele 24 de diade Plutchik
-# ─────────────────────────────────────────────
 TOATE_DIADELE = [
     ('Iubire',         'Bucurie',    'Incredere',  'primara'),
     ('Supunere',       'Incredere',  'Frica',      'primara'),
@@ -85,7 +87,6 @@ TOATE_DIADELE = [
     ('Anxietate',      'Anticipare', 'Frica',      'tertiara'),
 ]
 
-# Normalizare diacritice pentru scorurile returnate de model
 EMOTII_NORM = {
     'Încredere': 'Incredere',
     'Frică':     'Frica',
@@ -94,9 +95,6 @@ EMOTII_NORM = {
 }
 
 
-# ─────────────────────────────────────────────
-# Baza de date
-# ─────────────────────────────────────────────
 def init_database():
     """
     Initializarea bazei de date.
@@ -125,7 +123,6 @@ def init_database():
                 timestamp        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        # Migrare: adauga coloana diade_detectate daca tabela exista deja fara ea
         cursor.execute("""
             ALTER TABLE conversations
             ADD COLUMN IF NOT EXISTS diade_detectate JSONB
@@ -195,7 +192,6 @@ def afiseaza_statistici():
         distributie = cursor.fetchall()
 
         # Extrage toate diadele din campul JSONB si numara frecventele.
-        # jsonb_array_elements_text desface array-ul JSON intr-un rand per diada.
         cursor.execute("""
             SELECT diada, COUNT(*) as count
             FROM conversations,
@@ -298,9 +294,7 @@ class REDv2Dataset(Dataset):
         }
 
 
-# ─────────────────────────────────────────────
-# Antrenare / evaluare
-# ─────────────────────────────────────────────
+
 def evalueaza(model, loader, loss_fn):
     """
     Evalueaza modelul pe un set de date si calculeaza MSE si Hamming Loss.
@@ -407,9 +401,6 @@ def evalueaza_test(tokenizer):
     print(f"Hamming Loss: {hl:.4f}   (baseline paper: 0.102)")
 
 
-# ─────────────────────────────────────────────
-# Detectie diade Plutchik
-# ─────────────────────────────────────────────
 def normalizeaza_scoruri(scoruri: dict) -> dict:
     """
     Normalizeaza cheile din scoruri pentru a elimina diacriticele
@@ -467,9 +458,7 @@ def afiseaza_diade(diade_active: list):
         print(f"  {ec:18} {tip:10} {componente:24} {scor:.3f}  {bara}")
 
 
-# ─────────────────────────────────────────────
-# Pipeline principal de detectie
-# ─────────────────────────────────────────────
+
 def detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True):
     """
     Analizeaza un text prin intregul pipeline Aceso:
@@ -497,23 +486,18 @@ def detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True):
     print(f"\nText: {text}")
     print(f"{'═'*56}")
 
-    # 1. MAED rulat mereu — intern apeleaza hybrid per clauza
     rezultat_maed = analizeaza_multi_aspect(
         text, model, tokenizer, modul_lexical, ALPHA
     )
 
     nr_segmente = rezultat_maed['nr_segmente']
-    scoruri     = rezultat_maed['agregat']   # scorul final = agregatul ponderat
+    scoruri     = rezultat_maed['agregat']  
 
-    # 2. Afisare adaptiva
     if nr_segmente > 1:
-        # Text complex: afiseaza fiecare clauza, apoi agregatul
         print(f"  ANALIZA MULTI-ASPECT  ({nr_segmente} clauze)")
         print(f"  {'─'*50}")
         for i, seg in enumerate(rezultat_maed['segmente'], 1):
             scoruri_seg  = sorted(seg['scoruri'].items(),key=lambda x: x[1], reverse=True)
-            # Emoția dominantă per clauză — afișată inline lângă textul clauzei
-            # Permite vizualizarea conflictului emoțional chiar dacă agregatul îl netezeste
             dom_emotie   = scoruri_seg[0][0] if scoruri_seg else '—'
             dom_scor     = scoruri_seg[0][1] if scoruri_seg else 0.0
             print(f"\n  Clauza {i} [{dom_emotie} {dom_scor:.2f}]: \"{seg['text']}\"")
@@ -526,7 +510,6 @@ def detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True):
         print(f"\n  {'─'*50}")
         print(f"  SCOR AGREGAT (ponderat pe lungimea clauzei):")
     else:
-        # Propozitie simpla: afiseaza direct scorurile, fara header MAED
         print(f"  SCOR HIBRID (alpha={ALPHA}):")
 
     print(f"  {'─'*50}")
@@ -538,14 +521,12 @@ def detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True):
         print(f"    {emotie:12}: {scor:.3f}  {bara}")
     print(f"\n  Emotie dominanta: {emotie_dominanta} ({scor_dominant:.3f})")
 
-    # 3. Diade Plutchik pe scorurile agregate
     diade_active = detecteaza_diade(scoruri, prag=PRAG_DIADE)
     print(f"\n  {'─'*50}")
     print(f"  DIADE PLUTCHIK (prag={PRAG_DIADE}):")
     afiseaza_diade(diade_active)
     print(f"{'═'*56}")
 
-    # 4. Salvare in baza de date
     if salveaza:
         nume_diade = [d[0] for d in diade_active]
         salveaza_in_db(text, emotie_dominanta, scor_dominant,
@@ -559,9 +540,7 @@ def detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True):
     }
 
 
-# ─────────────────────────────────────────────
-# Mod interactiv
-# ─────────────────────────────────────────────
+
 def mod_interactiv(model, tokenizer, modul_lexical):
     """
     Interfata interactiva in linie de comanda.
@@ -600,9 +579,7 @@ def mod_interactiv(model, tokenizer, modul_lexical):
         detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True)
 
 
-# ─────────────────────────────────────────────
-# Entry point
-# ─────────────────────────────────────────────
+
 if __name__ == '__main__':
 
     init_database()
@@ -631,11 +608,9 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
     print(f"\nModel incarcat din {MODEL_PATH}")
 
-    # Initializare modul lexical (singleton folosit in tot pipeline-ul)
     modul_lexical = RoEmoLexModule()
     print("Modul lexical RoEmoLex incarcat\n")
 
-    # ── Test rapid ──────────────────────────────────────────────────
     print("=== TEST RAPID ===")
     exemple = [
         "Sunt atât de fericită, nu-mi vine să cred!",
@@ -646,5 +621,4 @@ if __name__ == '__main__':
     for ex in exemple:
         detecteaza_emotii(ex, model, tokenizer, modul_lexical, salveaza=False)
 
-    # ── Mod interactiv ─────────────────────────────────────────────
     mod_interactiv(model, tokenizer, modul_lexical)

@@ -2,3 +2,4 @@ best_model_3.pt
 data_REDv2/
 __pycache__/
 *.pyc
+.env
