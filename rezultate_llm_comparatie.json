@@ -9,10 +9,16 @@
       "Surpriză": 0.092,
       "Neutru": 0.08
     },
+    "citat_folosit": "„Cel care este mulțumit cu cel mai puțin, are cea mai mare bucurie, căci mulțumirea este bogăția naturii.\" — Socrate",
     "raspunsuri": {
-      "Groq+Llama3": "Îmi pare rău că cadoul nu a fost exact ceea ce ai dorit, dar este minunat că apreciezi gestul și gândul care se află în spatele lui. Este normal să te simți puțin dezamăgit, dar faptul că recunoști efortul depus de persoana care ți-a făcut cadoul arată că ai un suflet generos.",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 6.911967871s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '6s'}]}}",
-      "Mistral": "E normal să simți un pic de dezamăgire, chiar dacă știi că intenția din spatele gestului a fost frumoasă. Aprecierea ta pentru efortul celuilalt arată cât de mult contează pentru tine conexiunea dintre voi."
+      "fara_citat": {
+        "Groq+Llama3": "Îmi pare rău că cadoul nu a fost exact ce ai visat, dar e minunat că apreciezi gândul și efortul depus de cei care ți l-au oferit. E normal să ai sentimente amestecate în astfel de situații. Îți înțeleg și apreciez sinceritatea.",
+        "Mistral": "E normal să simți un pic de dezamăgire când ceva nu se potrivește exact cu ce ți-ai dorit, chiar dacă știi că a fost făcut cu inimă bună. Aprecierea ta pentru gest contează mult, și asta spune deja multe despre tine. E frumos că poți vedea partea plină a paharului."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Îmi pare rău că cadoul nu a fost exact ceea ce te-așteptai, dar e frumos că apreciezi gestul în sine - asta arată că valorizezi gândul și efortul depus de celălalt. Se pare că, deși nu ești complet încântat, poți găsi o oarecare satisfacție în a ști că ai fost luat în considerare. Așa că, chiar dacă nu e exact ceea ce ai visat, poți găsi o bucurie simplă în a primi ceva de la cineva care se gândește la tine.",
+        "Mistral": "E normal să simți un pic de dezamăgire, chiar dacă gestul în sine te-a mișcat. Aprecierea pentru intenția din spatele cadoului e frumoasă, și asta spune mult despre tine. Uneori, emoțiile noastre sunt ca un puzzle – unele piese strălucesc mai tare, altele mai discret, dar toate fac parte din imaginea de ansamblu."
+      }
     }
   },
   {
@@ -28,10 +34,16 @@
       "Tristețe": 0.081,
       "Surpriză": 0.069
     },
+    "citat_folosit": "„Bucuria este o activitate a sufletului în conformitate cu virtutea.\" — Aristotel",
     "raspunsuri": {
-      "Groq+Llama3": "Îmi pare bine că ai avut o zi plăcută cu prietenii, chiar dacă a existat un mic neînțeles. E normal să apară astfel de situații, dar pare că bucuria întâlnirii a fost mai puternică decât neplăcerile. Te rog să îmi spui mai multe despre cum te-ai simțit în timpul acestei întâlniri.",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 30.169270082s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '30s'}]}}",
-      "Mistral": "Ce frumos că ai petrecut timp cu prietenii tăi, chiar dacă a fost și un mic nor pe cer! Se vede că ți-a făcut plăcere revederea, și asta contează atât de mult. Certurile trecătoare fac parte din orice relație vie, dar bucuria de a fi împreună rămâne."
+      "fara_citat": {
+        "Groq+Llama3": "E minunat că ai avut ocazia să te întâlnești cu prietenii tăi, chiar dacă a fost o zi cu câteva momente mai dificile. Pare că bucuria de a fi împreună a fost mai puternică decât certurile, și asta este cu adevărat special. Se pare că această întâlnire a adus o rază de lumină în viața ta.",
+        "Mistral": "Ce frumos că ai petrecut timp cu prietenii tăi, chiar dacă a fost și un mic nor pe cer! Se vede că ți-a făcut plăcere întâlnirea asta, iar certurile trecătoare fac parte din orice relație vie. Mă bucur pentru tine că ai avut parte de o zi atât de plină de conexiune."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Se pare că ai avut o zi plină de emoții, dar în final, bucuria de a te fi întâlnit cu prietenii a predominat. Chiar dacă ați avut un mic conflict, este minunat că puteți trece peste astfel de momente și vă puteți bucura de timpul petrecut împreună. Este o dovadă a puterii relațiilor voastre și a faptului că valorizați legătura pe care o aveți.",
+        "Mistral": "Ce frumos că ai avut parte de o zi plină de conexiune, chiar dacă a fost și un pic tensionată ici-colo. E minunat să simți căldura prieteniei, chiar și atunci când apar mici neînțelegeri — asta face parte din viață, nu? Se vede cât de mult contează pentru tine acele momente."
+      }
     }
   },
   {
@@ -44,10 +56,16 @@
       "Încredere": 0.068,
       "Frică": 0.064
     },
+    "citat_folosit": "„Un om neutru este un om care nu a părăsit încă peștera.\" — George Bernard Shaw",
     "raspunsuri": {
-      "Groq+Llama3": "Îți înțeleg sentimentul, este normal să te simți nesigur sau reticent în a ieși la întâlniri, mai ales dacă te-ai oprit pentru o perioadă. Poate ai nevoie de timp pentru a te reconecta cu tine însuți și a-ți regăsi energia și entuziasmul pentru a ieși în lume și a cunoaște oameni noi.",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 52.657712971s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '52s'}]}}",
-      "Mistral": "E normal să simți asta, mai ales după ce ai trecut prin experiențe care te-au marcat. E loc de răbdare cu tine însuți, fără să te grăbești. Poate că acum ai nevoie doar de timp să te regăsești."
+      "fara_citat": {
+        "Groq+Llama3": "Îți înțeleg sentimentul, pare că te simți puțin nesigur în legătură cu ideea de a ieși la întâlniri din nou. Este normal să ai nevoie de timp pentru a te pregăti și a te simți confortabil cu acest lucru. Cum te-ai simțit în ultimul timp când ai fost la întâlniri?",
+        "Mistral": "E normal să simți asta, mai ales după ce ai trecut prin experiențe care te-au marcat. E loc de răbdare cu tine însuți, fără să te grăbești. Poate că momentul acesta de pauză e exact ce îți trebuie acum."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Îți înțeleg rezerva și îți recunosc nevoia de a te simți pregătit înainte de a face un nou pas. Poate ai nevoie de timp pentru a reflecta la ceea ce ți se potrivește și la ce îți lipsește în acest moment, și asta e perfect normal.",
+        "Mistral": "E normal să simți asta, mai ales când pașii înainte par mari și încărcați de necunoscut. Poate că nu e vorba de pregătire, ci doar de momentul potrivit — și e în regulă să-l aștepți fără presiune. Te înțeleg."
+      }
     }
   },
   {
@@ -60,10 +78,16 @@
       "Încredere": 0.234,
       "Surpriză": 0.052
     },
+    "citat_folosit": "„Lumea este o scenă, dar piesa este prost distribuită. Așteptarea este singurul lucru care ne mai ține în lojă.\" — Oscar Wilde",
     "raspunsuri": {
-      "Groq+Llama3": "Sunt atât de bucuros să aud asta! Pare că te afli într-un moment minunat al vieții tale, plin de entuziasm și așteptare. Îți merită să te bucuri de această fericire și să o savurezi în fiecare moment!",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 14.596968015s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '14s'}]}}",
-      "Mistral": "Ce minunat să auzi asta! Se simte că trăiești un moment cu adevărat luminos, în care totul pare să vibreze în armonie. E frumos când fericirea îți umple inima așa, fără rezerve."
+      "fara_citat": {
+        "Groq+Llama3": "Sunt atât de bucuros pentru tine! Pare că te simți foarte împlinit și fericit în acest moment, și asta este minunat. Te înțeleg perfect, ești plin de energie pozitivă și entuziasm.",
+        "Mistral": "Ce minunat să auzi asta! Se simte că trăiești un moment cu adevărat luminos, în care totul pare să fie exact așa cum ți-ai dorit. Bucuria asta sinceră merită să fie savurată din plin."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Se pare că te afli într-un moment de mare bucurie și anticipare, ceea ce este absolut minunat! Pare că ai o perspectivă foarte optimistă asupra viitorului, și acest lucru te face să te simți fericit și plin de speranță. Este ca și cum ai fi pe punctul de a descoperi ceva nou și emoționant, și această așteptare te ține cu sufletul la gură.",
+        "Mistral": "Ce minunat să auzi asta! E atât de frumos când simți că ai ajuns într-un loc al inimii unde totul respiră lumină și împlinire. Se vede clar că trăiești un moment în care viața îți zâmbește din toată ființa."
+      }
     }
   },
   {
@@ -76,27 +100,40 @@
       "Frică": 0.113,
       "Încredere": 0.098
     },
+    "citat_folosit": "„Indiferența este mai rea decât ura, pentru că este neutră. Ura este o pasiune, dar indiferența este moartea oricărui simțământ.\" — Eugen Ionescu",
     "raspunsuri": {
-      "Groq+Llama3": "Pare că ai o abordare destul de calmă și echilibrată față de evenimentele din jurul tău. Este ca și cum ai reuși să menții o distanță emoțională sănătoasă, ceea ce te ajută să nu fii afectată prea mult de ceea ce se întâmplă. Cum te simți când spui că nu ești afectată de ce se întâmplă în jurul tău?",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 37.945559196s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '37s'}]}}",
-      "Mistral": "Se simte uneori că lucrurile din jur curg fără să te atingă prea tare, și e în regulă să te simți așa. Poate că ai găsit un fel de liniște în a observa, fără să lași totul să te influențeze. E frumos că ai această claritate."
+      "fara_citat": {
+        "Groq+Llama3": "Îți înțeleg sentimentul de detașare, este ca și cum ai construit un scut care te protejează de ceea ce se întâmplă în jurul tău. Te simți poate puțin izolată, dar în același timp, ai o senzație de control asupra propriilor emoții.",
+        "Mistral": "Se simte uneori că lucrurile din jur curg fără să te atingă prea tare, și e în regulă așa. E loc și pentru momentele în care te simți detașat, fără să fie nevoie să justifici asta."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Îmi pare că simți o distanță față de evenimentele care se petrec în jurul tău, ca și cum nu te-ar atinge pe tine direct. Acest sentiment de neutralitate poate fi uneori un mecanism de apărare, dar și o sursă de singurătate. Te simți maybe izolată de ceea ce se întâmplă în jur, sau poate doar cauți să păstrezi un echilibru în viața ta?",
+        "Mistral": "Se pare că ai ajuns într-un loc în care lucrurile din jur pur și simplu nu te mai ating, ca și cum ai ridicat un zid invizibil. E în regulă să simți asta — uneori, e singura modalitate de a-ți proteja liniștea interioară. Poate că e doar o pauză de care ai nevoie, sau poate că ai învățat să filtrezi ce merită să te emoționeze."
+      }
     }
   },
   {
-    "text": "Nu pot să cred că șeful meu și-a atribuit tot meritul pentru proiectul meu și a luat promovarea pe care o meritam eu.Sunt convins că voi face dreptate și îi voi arăta tuturor ce om fără caracter este.",
+    "text": "Nu pot să cred că șeful meu și-a atribuit tot meritul pentru proiectul meu și a luat promovarea pe care o meritam eu. Sunt convins că voi face dreptate și îi voi arăta tuturor ce om fără caracter este.",
     "emotie_dominanta": "Încredere",
-    "scor_dominant": 0.891,
+    "scor_dominant": 0.871,
     "scoruri": {
-      "Încredere": 0.891,
+      "Încredere": 0.871,
       "Anticipare": 0.636,
-      "Bucurie": 0.072,
-      "Tristețe": 0.062,
-      "Neutru": 0.061
+      "Furie": 0.08,
+      "Tristețe": 0.071,
+      "Neutru": 0.067,
+      "Bucurie": 0.054
     },
+    "citat_folosit": "„Când îți pierzi încrederea în tine, îi dai putere altcuiva asupra vieții tale.\" — Diane von Furstenberg",
     "raspunsuri": {
-      "Groq+Llama3": "Îmi pare rău să auzi asta, pare că ai fost profund dezamăgit și nedreptățit de situația cu șeful tău. E normal să te simți astfel, mai ales când ai pus atât de multă muncă și dedicare în proiect. Îți pot înțelege sentimentul de frustrare și dorința de a face dreptate.",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 875.199997ms.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '0s'}]}}",
-      "Mistral": "Îmi pare atât de rău că ai trecut prin asta, e nedrept și te înțeleg perfect. E firesc să simți că vrei să demonstrezi ce poți, mai ales când ai muncit atât de mult. Ai tot dreptul să fii mândru de tine și să vrei să-ți faci vocea auzită."
+      "fara_citat": {
+        "Groq+Llama3": "Îmi pare rău să auzi că ai fost tratat în acest mod. Este firesc să te simți nedreptățit și să vrei să corectezi această situație, mai ales când ai pus atât de mult efort în proiect. Se pare că ai o viziune clară despre cum vrei să procedezi și asta arată că ai încredere în capacitățile tale.",
+        "Mistral": "Îmi pare atât de rău că ai trecut prin asta, e nedrept și te înțeleg perfect. E firesc să simți că vrei să demonstrezi ce poți, mai ales când ai muncit atât de mult. Ai tot dreptul să fii mândru de tine și să vrei să-ți faci vocea auzită."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Îmi pare rău să auzi că ai trecut prin această experiență dificilă și nedreaptă. Înțeleg că te simți furios și nedreptățit, dar este minunat să vezi că încă ai încredere în abilitățile tale și în justețea cauzei tale. Să nu îți pierzi din vedere puterea și valoarea ta, pentru că acestea sunt lucrurile care te vor ajuta să treci peste această situație și să ieși mai puternic.",
+        "Mistral": "Îmi pare rău că ai trecut prin asta, e nedrept și te înțeleg perfect. E firesc să simți că vrei să demonstrezi ce poți, mai ales când ai muncit atât de mult. Ai tot dreptul să fii mândru de tine și să-ți păstrezi această claritate."
+      }
     }
   },
   {
@@ -109,10 +146,16 @@
       "Tristețe": 0.141,
       "Neutru": 0.084
     },
+    "citat_folosit": "„Bucuria este o activitate a sufletului în conformitate cu virtutea.\" — Aristotel",
     "raspunsuri": {
-      "Groq+Llama3": "Îmi pare bine să auzi că te-ai străduit mult pentru examen și că ai o senzație de mândrie pentru ceea ce ai realizat. Este normal să te simți îngrijorat, dar pare că ai o bază solidă pe care poți să te sprijini. Să te bucuri de această senzație de realizare și să îți dai voie să te simți mândru de tine!",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 23.705754813s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '23s'}]}}",
-      "Mistral": "E normal să simți această îngrijorare înainte de examen, dar e minunat că recunoști efortul pe care l-ai depus. Mândria ta este pe deplin justificată – ai muncit mult și asta contează enorm. Îți doresc să te simți cât mai liniștit și să ai încredere în tine."
+      "fara_citat": {
+        "Groq+Llama3": "Îmi pare bine că ai reușit să înveți mult și că te simți mândru de asta - e un sentiment minunat! În același timp, sunt aici să te ascult și să te ajut să procesezi și îngrijorarea ta legată de examen. Este normal să te simți așa, dar pare că ai făcut pași importanți pentru a te pregăti.",
+        "Mistral": "E normal să simți această ușoară neliniște înainte de examen, dar îmi place mult cum ai reușit să te concentrezi și să înveți atât de mult. Se vede că efortul tău merită recunoscut și că ai toate motivele să fii mândru de tine."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Îmi pare bine să auzi că te-ai străduit mult pentru examen și că te simți mândru de ceea ce ai realizat. Este normal să fii îngrijorat, dar faptul că ai învățat mult și te simți mândru de asta arată că ai o bază solidă pentru a aborda examenul cu încredere. Bucuria pe care o simți din cauza eforturilor tale este cu siguranță un semn că ai făcut progrese importante și că te îndrepți în direcția corectă.",
+        "Mistral": "E normal să simți această neliniște înainte de examen, dar e frumos că poți să te bucuri de efortul pe care l-ai făcut. Faptul că ai învățat mult și recunoști asta spune multe despre tine — ai toate motivele să fii mândru."
+      }
     }
   },
   {
@@ -127,10 +170,16 @@
       "Neutru": 0.13,
       "Frică": 0.07
     },
+    "citat_folosit": "„Tristețea este o parte a vieții, dar nu trebuie să fie întreaga viață.\" — Agatha Christie",
     "raspunsuri": {
-      "Groq+Llama3": "Îmi pare rău să auzi că te simți dezamăgit de alegerea ta de a studia medicina, mai ales că ai făcut-o din dragoste și respect pentru mama ta. Este normal să te simți trist și confuz atunci când realizezi că poate nu este drumul potrivit pentru tine. Te înțeleg și sunt aici să ascult și să te sprijin în acest moment dificil.",
-      "Gemini Flash": "[EROARE Gemini] 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 46.37411759s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}}",
-      "Mistral": "Îmi pare rău că te simți așa, e greu când descoperi că o alegere făcută cu încredere nu te face fericită. E normal să te simți dezamăgită, mai ales când așteptările erau legate de cineva atât de important pentru tine. Ai curajul să recunoști asta, și asta spune multe despre tine."
+      "fara_citat": {
+        "Groq+Llama3": "Îmi pare rău să auzi că te simți dezamăgit de alegerea ta de a studia medicina, mai ales că ai făcut-o din cauza încrederii în mama ta. Poate te simți și puțin confuz acum, dar e important să recunoaștem că ai avut intenții bune și ai vrut să faci ceva care să o facă pe mama ta mândră. Acum, hai să vorbim despre ce te face să te simți așa și ce poți face în continuare pentru a găsi o soluție care să te facă fericit.",
+        "Mistral": "Îmi pare rău că te simți așa, e greu când descoperi că o alegere făcută cu încredere nu te face fericită. E normal să te simți dezamăgită, mai ales când ai pus atâta speranță în părerea cuiva drag. Ai curajul să recunoști asta, și asta spune multe despre tine."
+      },
+      "cu_citat": {
+        "Groq+Llama3": "Îmi pare rău să auzi că te simți dezamăgit de alegerea ta de a studia medicina, mai ales că a fost influențată de încrederea pe care o ai în mama ta. Este normal să te simți trist când realizăm că unele decizii nu ne aduc fericirea pe care ne-o dorim. Poate este momentul să reflectezi la ce te-ar face cu adevărat fericit și să găsești o cale de a integra acea pasiune în viața ta.",
+        "Mistral": "Îmi pare rău că te simți așa, e greu când descoperi că o alegere făcută cu încredere nu te face fericită. E firesc să te simți dezamăgită, mai ales când a fost o decizie atât de importantă și atât de legată de cineva drag. Ai curajul să recunoști asta, și asta spune multe despre tine."
+      }
     }
   }
 ]
