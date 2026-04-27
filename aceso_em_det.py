@@ -31,7 +31,7 @@ from model_logic    import (EmotionRegressor, incarca_model,
 from lexical_module import RoEmoLexModule
 from hybrid_module  import analizeaza_text
 from multi_aspect   import analizeaza_multi_aspect, afiseaza_rezultate as afiseaza_maed
-
+from groq_integrare import genereaza_raspuns_empatic
 
 ALPHA       = 0.9   # calibrat prin ablation study pe REDv2 (MSE=0.0433)
 PRAG_DIADE  = 0.25   # prag optim selectat dupa testarea la 0.2 / 0.3 / 0.4 / 0.5
@@ -523,6 +523,10 @@ def detecteaza_emotii(text, model, tokenizer, modul_lexical, salveaza=True):
     print(f"\n  {'─'*50}")
     print(f"  DIADE PLUTCHIK (prag={PRAG_DIADE}):")
     afiseaza_diade(diade_active)
+    print(f"{'═'*56}")
+
+    raspuns_empatic = genereaza_raspuns_empatic(text, scoruri, afiseaza_citat=True)
+    print(f"\n  Aceso: {raspuns_empatic}")
     print(f"{'═'*56}")
 
     if salveaza:
