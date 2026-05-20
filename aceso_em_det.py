@@ -25,13 +25,13 @@ import sys
 from collections import Counter
 from dotenv import load_dotenv
 
-from preprocess     import preproceseaza_model
-from model_logic    import (EmotionRegressor, incarca_model,
+from backend.core.preprocess     import preproceseaza_model
+from backend.core.model_logic    import (EmotionRegressor, incarca_model,
                              EMOTII, MODEL_NAME, MAX_LENGTH, DEVICE, MODEL_PATH)
-from lexical_module import RoEmoLexModule
-from hybrid_module  import analizeaza_text
-from multi_aspect   import analizeaza_multi_aspect, afiseaza_rezultate as afiseaza_maed
-from groq_integrare import genereaza_raspuns_empatic
+from backend.core.lexical_module import RoEmoLexModule
+from backend.core.hybrid_module  import analizeaza_text
+from backend.core.multi_aspect   import analizeaza_multi_aspect, afiseaza_rezultate as afiseaza_maed
+from backend.services.groq_integrare import genereaza_raspuns_empatic
 
 ALPHA       = 0.9   # calibrat prin ablation study pe REDv2 (MSE=0.0433)
 PRAG_DIADE  = 0.25   # prag optim selectat dupa testarea la 0.2 / 0.3 / 0.4 / 0.5
