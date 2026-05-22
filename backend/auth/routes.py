@@ -1,7 +1,10 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from datetime import datetime, timezone
 import httpx
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, EmailStr
 
@@ -78,7 +81,11 @@ def google_login():
 
 
 @router.get("/google/callback")
-async def google_callback(code: str):
+async def google_callback(request: Request):
+    code = request.query_params.get("code")
+    if not code:
+        return RedirectResponse(f"{FRONTEND_URL}/login")
+
     async with httpx.AsyncClient() as client:
         token_resp = await client.post(
             "https://oauth2.googleapis.com/token",
@@ -91,8 +98,12 @@ async def google_callback(code: str):
             }
         )
     token_data = token_resp.json()
-    if "error" in token_data:
-        raise HTTPException(400, token_data["error"])
+
+    if "access_token" not in token_data:
+        error = token_data.get("error", "unknown_error")
+        if error == "invalid_grant":
+            return RedirectResponse(f"{FRONTEND_URL}/login")
+        raise HTTPException(400, error)
 
     async with httpx.AsyncClient() as client:
         user_info = await client.get(

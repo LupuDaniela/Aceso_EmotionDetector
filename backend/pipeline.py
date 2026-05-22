@@ -5,10 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from core.model_logic    import EmotionRegressor, incarca_model, DEVICE, MODEL_PATH
-from core.lexical_module import RoEmoLexModule
-from core.multi_aspect   import analizeaza_multi_aspect
-from db.database         import get_conn
+from core.model_logic      import EmotionRegressor, incarca_model, DEVICE, MODEL_PATH
+from core.lexical_module   import RoEmoLexModule
+from core.multi_aspect     import analizeaza_multi_aspect
+from db.database           import get_conn
+from services.groq_integrare import genereaza_raspuns_empatic
 
 ALPHA      = 0.9
 PRAG_DIADE = 0.25
@@ -71,6 +72,8 @@ class AcesoPipeline:
         scor_dominant    = sortat[0][1]
         diade            = self._detecteaza_diade(scoruri)
 
+        raspuns_empatic  = genereaza_raspuns_empatic(text, scoruri)
+
         if salveaza:
             self._salveaza(text, emotie_dominanta, scor_dominant,
                            scoruri, [d[0] for d in diade], user_id=user_id)
@@ -79,6 +82,7 @@ class AcesoPipeline:
             'scoruri':          {k: round(v, 4) for k, v in scoruri.items()},
             'emotie_dominanta': emotie_dominanta,
             'scor_dominant':    round(scor_dominant, 4),
+            'raspuns_empatic':  raspuns_empatic,
             'diade': [
                 {'nume': d[0], 'emotie1': d[1], 'emotie2': d[2],
                  'tip': d[3], 'scor': round(d[4], 4)}
