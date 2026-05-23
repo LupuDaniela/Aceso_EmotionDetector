@@ -1,0 +1,57 @@
+.grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.slot {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.slot:hover {
+  transform: scale(1.10);
+}
+
+.compact {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+}
+
+.unlocked img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.locked {
+  background: rgba(255,255,255,0.07);
+  border: 1.5px dashed rgba(255,255,255,0.20);
+  opacity: 0.48;
+  font-size: 20px;
+}
+
+.compact.locked {
+  font-size: 16px;
+}
+
+.label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.52);
+  text-align: center;
+}

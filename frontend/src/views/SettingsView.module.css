@@ -1,0 +1,13 @@
+.list { display: flex; flex-direction: column; gap: 8px; }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.07);
+}
+
+.key { font-size: 12px; color: rgba(255,255,255,0.48); }
+.val { font-size: 13px; font-weight: 600; color: #fff; }

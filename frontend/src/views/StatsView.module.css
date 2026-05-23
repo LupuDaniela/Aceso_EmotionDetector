@@ -1,0 +1,14 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.statCard {
+  background: rgba(255,255,255,0.10);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.val { font-size: 26px; font-weight: 800; color: #fff; }
+.lbl { font-size: 11px; color: rgba(255,255,255,0.58); margin-top: 3px; }
