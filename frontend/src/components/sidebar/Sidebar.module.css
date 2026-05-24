@@ -1,33 +1,35 @@
 .sidebar {
-  position: relative;
-  z-index: 10;
   width: 220px;
-  flex-shrink: 0;
+  min-width: 220px;
+  height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid rgba(139, 110, 197, 0.10);
   display: flex;
   flex-direction: column;
-  padding: 20px 12px;
-  transition: background 0.45s ease;
-}
-
-.logoWrap {
-  display: flex;
-  justify-content: center;
-  padding: 0 8px;
-  margin-bottom: 28px;
+  padding: 20px 0 16px;
+  flex-shrink: 0;
+  box-shadow: 2px 0 20px rgba(139, 110, 197, 0.06);
 }
 
 .logo {
-  height: 54px;
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(139, 110, 197, 0.08);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.logoImg {
+  height: 36px;
   width: auto;
   object-fit: contain;
 }
 
-.navList {
-  list-style: none;
+.nav {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  flex: 1;
+  gap: 2px;
+  padding: 0 10px;
 }
 
 .navItem {
@@ -35,62 +37,79 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 10px 12px;
   border: none;
+  border-radius: 12px;
   background: transparent;
   cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.68);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #6B6280;
   text-align: left;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background 0.15s, color 0.15s;
 }
 
-.navItem:hover:not(.active) {
-  background: rgba(255,255,255,0.10);
-  color: #fff;
+.navItem:hover {
+  background: var(--accent-light, #EDE8F8);
+  color: var(--accent, #8B6EC5);
 }
 
 .navItem.active {
+  background: var(--accent, #8B6EC5);
   color: #fff;
+  font-weight: 700;
 }
 
-.icon {
+.navIcon {
   font-size: 16px;
+  flex-shrink: 0;
   width: 20px;
   text-align: center;
-  flex-shrink: 0;
 }
 
-.footer {
-  margin-top: auto;
-  padding: 0 4px;
+.navLabel { line-height: 1.2; }
+
+.spacer { flex: 1; }
+
+.currentAch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px 8px;
+  padding: 10px 12px;
+  background: var(--accent-light, #EDE8F8);
+  border-radius: 14px;
 }
+
+.achImg   { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.achName  { font-size: 12px; font-weight: 700; color: #2D2640; line-height: 1.2; }
+.achStreak { font-size: 11px; color: var(--accent, #8B6EC5); margin-top: 2px; }
 
 .logoutBtn {
-  width: 100%;
-  padding: 9px 14px;
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 10px;
-  cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  font-size: 12px;
+  margin: 0 10px 8px;
+  padding: 10px 12px;
+  border: 1.5px solid rgba(139, 110, 197, 0.25);
+  border-radius: 12px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 600;
-  color: rgba(255,255,255,0.62);
-  transition: background 0.2s, color 0.2s;
-  margin-bottom: 8px;
+  color: #6B6280;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: calc(100% - 20px);
 }
 
 .logoutBtn:hover {
-  background: rgba(255,255,255,0.18);
-  color: #fff;
+  background: #fff0f0;
+  border-color: #e0a0a0;
+  color: #b05050;
 }
 
 .version {
-  font-size: 10px;
-  color: rgba(255,255,255,0.26);
   text-align: center;
+  font-size: 10px;
+  color: #C4B8E8;
+  padding: 0 10px;
 }

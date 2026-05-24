@@ -1,38 +1,21 @@
-export type ThemeKey = 'purple' | 'sunset' | 'forest' | 'galaxy'
-
 export type NavView =
   | 'home'
+  | 'conversation'
+  | 'history'
   | 'stats'
   | 'calendar'
   | 'settings'
   | 'achievements'
 
 export type MoodKey =
-  | 'joy'
-  | 'sadness'
-  | 'fear'
-  | 'anger'
-  | 'surprise'
-  | 'trust'
-  | 'anticipation'
-  | 'disgust'
-  | 'love'
-  | 'neutral'
+  | 'joy' | 'sadness' | 'fear' | 'anger'
+  | 'surprise' | 'trust' | 'anticipation'
+  | 'disgust' | 'love' | 'neutral'
 
 export interface MoodConfig {
   emoji: string
   label: string
   color: string
-}
-
-export interface ThemeConfig {
-  key:         ThemeKey
-  name:        string
-  bg:          string
-  bgColor:     string
-  sidebarBg:   string
-  activeNavBg: string
-  fillColor:   string
 }
 
 export interface AchievementConfig {

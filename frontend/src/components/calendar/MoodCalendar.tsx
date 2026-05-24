@@ -7,6 +7,7 @@ import styles from '../calendar/ModdCalendar.module.css'
 
 interface Props extends CalendarProps {
   showLegend?: boolean
+  light?:      boolean
 }
 
 export default function MoodCalendar({
@@ -14,6 +15,7 @@ export default function MoodCalendar({
   canGoNext, onLogMood, onRemoveMood,
   onPrevMonth, onNextMonth, onToday,
   showLegend = false,
+  light = false,
 }: Props) {
   const [pickerKey, setPickerKey] = useState<string | null>(null)
 
@@ -21,9 +23,7 @@ export default function MoodCalendar({
   const startOffset = getMonthStartOffset(currentYear, currentMonth)
 
   const now            = new Date()
-  const isCurrentMonth =
-    currentYear  === now.getFullYear() &&
-    currentMonth === now.getMonth()
+  const isCurrentMonth = currentYear === now.getFullYear() && currentMonth === now.getMonth()
 
   function handleDayClick(day: number) {
     if (isFutureDay(currentYear, currentMonth, day)) return
@@ -42,15 +42,12 @@ export default function MoodCalendar({
     setPickerKey(null)
   }
 
+  const rootClass = [styles.root, light ? styles.light : ''].filter(Boolean).join(' ')
+
   return (
-    <div className={styles.root}>
+    <div className={rootClass}>
       <div className={styles.nav}>
-        <button
-          type="button"
-          className={styles.navBtn}
-          onClick={onPrevMonth}
-          aria-label="Luna anterioară"
-        >
+        <button type="button" className={styles.navBtn} onClick={onPrevMonth} aria-label="Luna anterioară">
           ‹
         </button>
 
@@ -122,11 +119,7 @@ export default function MoodCalendar({
           {(Object.entries(MOOD_CONFIG) as [MoodKey, typeof MOOD_CONFIG[MoodKey]][]).map(
             ([key, { emoji, label, color }]) => (
               <div key={key} className={styles.legendItem} role="listitem">
-                <span
-                  className={styles.legendDot}
-                  style={{ background: color }}
-                  aria-hidden="true"
-                >
+                <span className={styles.legendDot} style={{ background: color }} aria-hidden="true">
                   {emoji}
                 </span>
                 <span className={styles.legendLabel}>{label}</span>

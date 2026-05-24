@@ -1,72 +1,68 @@
-import logoAceso from '@/assets/logo_aceso.png'
-import type { NavView } from '@/types'
+import logo from '@/assets/logo_aceso.png'
+import type { NavView, AchievementConfig } from '@/types'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './Sidebar.module.css'
 
-interface NavItem {
-  view:  NavView
-  icon:  string
-  label: string
+interface Props {
+  activeView:       NavView
+  onView:           (v: NavView) => void
+  streak:           number
+  currentCharacter: AchievementConfig | null
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { view: 'home',         icon: '💬', label: 'Conversație nouă'     },
-  { view: 'stats',        icon: '📊', label: 'Statistici'            },
-  { view: 'calendar',     icon: '📅', label: 'Calendar dispoziție'  },
-  { view: 'settings',     icon: '⚙️',  label: 'Setări'               },
-  { view: 'achievements', icon: '🏆', label: 'Realizări & Avataruri' },
+const NAV_ITEMS: { id: NavView; icon: string; label: string }[] = [
+  { id: 'home',         icon: '🏠', label: 'Acasă' },
+  { id: 'conversation', icon: '💬', label: 'Conversație nouă' },
+  { id: 'history',      icon: '📜', label: 'Conversații avute' },
+  { id: 'stats',        icon: '📊', label: 'Statistici' },
+  { id: 'calendar',     icon: '📅', label: 'Calendar dispoziție' },
+  { id: 'achievements', icon: '🏆', label: 'Realizări & Avataruri' },
+  { id: 'settings',     icon: '⚙️', label: 'Setări' },
 ]
 
-interface Props {
-  activeView:  NavView
-  sidebarBg:   string
-  activeNavBg: string
-  onNavigate:  (view: NavView) => void
-  onLogout:    () => void
-}
+export default function Sidebar({ activeView, onView, streak, currentCharacter }: Props) {
+  const { logout } = useAuth()
 
-export default function Sidebar({
-  activeView, sidebarBg, activeNavBg, onNavigate, onLogout,
-}: Props) {
   return (
-    <nav
-      className={styles.sidebar}
-      style={{ background: sidebarBg }}
-      aria-label="Navigare principală"
-    >
-      <div className={styles.logoWrap}>
-        <img src={logoAceso} alt="Aceso" className={styles.logo} />
+    <aside className={styles.sidebar}>
+      <div className={styles.logo}>
+        <img src={logo} alt="Aceso" className={styles.logoImg} />
       </div>
 
-      <ul className={styles.navList} role="list">
-        {NAV_ITEMS.map(({ view, icon, label }) => {
-          const isActive = activeView === view
-          return (
-            <li key={view}>
-              <button
-                type="button"
-                className={`${styles.navItem} ${isActive ? styles.active : ''}`}
-                style={isActive ? { background: activeNavBg } : undefined}
-                onClick={() => onNavigate(view)}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                <span className={styles.icon} aria-hidden="true">{icon}</span>
-                {label}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+      <nav className={styles.nav}>
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.id}
+            type="button"
+            className={[
+              styles.navItem,
+              activeView === item.id ? styles.active : '',
+            ].filter(Boolean).join(' ')}
+            onClick={() => onView(item.id)}
+          >
+            <span className={styles.navIcon}>{item.icon}</span>
+            <span className={styles.navLabel}>{item.label}</span>
+          </button>
+        ))}
+      </nav>
 
-      <footer className={styles.footer}>
-        <button
-          type="button"
-          className={styles.logoutBtn}
-          onClick={onLogout}
-        >
-          Deconectare
-        </button>
-        <p className={styles.version}>Aceso EmotionDetector v1.0</p>
-      </footer>
-    </nav>
+      <div className={styles.spacer} />
+
+      {currentCharacter && (
+        <div className={styles.currentAch}>
+          <img src={currentCharacter.img} alt={currentCharacter.name} className={styles.achImg} />
+          <div>
+            <p className={styles.achName}>{currentCharacter.name}</p>
+            <p className={styles.achStreak}>🔥 {streak} zile</p>
+          </div>
+        </div>
+      )}
+
+      <button type="button" className={styles.logoutBtn} onClick={logout}>
+        Deconectare
+      </button>
+
+      <p className={styles.version}>Aceso EmotionDetector v1.0</p>
+    </aside>
   )
 }

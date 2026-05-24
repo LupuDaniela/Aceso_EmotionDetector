@@ -1,0 +1,158 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 640px;
+}
+
+.header { padding-bottom: 4px; }
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #2D2640;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6B6280;
+  line-height: 1.5;
+}
+
+.progressCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 16px rgba(139, 110, 197, 0.10);
+  border: 1px solid rgba(139, 110, 197, 0.08);
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progressLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D2640;
+}
+
+.progressPct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent, #8B6EC5);
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--accent-light, #EDE8F8);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent, #8B6EC5);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2D2640;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent, #8B6EC5);
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.linkBtn:hover { opacity: 0.7; }
+
+.calendarCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 16px rgba(139, 110, 197, 0.10);
+  border: 1px solid rgba(139, 110, 197, 0.08);
+}
+
+.calendarCard :global(.navBtn) {
+  background: rgba(139, 110, 197, 0.08) !important;
+  color: var(--accent, #8B6EC5) !important;
+}
+.calendarCard :global(.navBtn):hover {
+  background: rgba(139, 110, 197, 0.16) !important;
+}
+.calendarCard :global(.monthLabel) { color: #2D2640 !important; }
+.calendarCard :global(.todayBtn) {
+  background: var(--accent-light, #EDE8F8) !important;
+  color: var(--accent, #8B6EC5) !important;
+}
+.calendarCard :global(.weekday) { color: #A098BC !important; }
+.calendarCard :global(.past) { background: rgba(139, 110, 197, 0.06) !important; }
+.calendarCard :global(.past):hover { background: rgba(139, 110, 197, 0.14) !important; }
+.calendarCard :global(.future) { background: rgba(139, 110, 197, 0.02) !important; }
+.calendarCard :global(.num) { color: #6B6280 !important; }
+.calendarCard :global(.today) { box-shadow: 0 0 0 2px var(--accent, #8B6EC5) !important; }
+
+.achCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 16px rgba(139, 110, 197, 0.10);
+  border: 1px solid rgba(139, 110, 197, 0.08);
+}
+
+.achEmptyCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: 0 2px 16px rgba(139, 110, 197, 0.10);
+  border: 1.5px dashed rgba(139, 110, 197, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.achEmptyIcon { font-size: 32px; opacity: 0.5; }
+
+.achEmptyTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6B6280;
+}
+
+.achEmptyHint {
+  font-size: 13px;
+  color: #A098BC;
+}
+
+.achEmptyHint strong { color: var(--accent, #8B6EC5); }

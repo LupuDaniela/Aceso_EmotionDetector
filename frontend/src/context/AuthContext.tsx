@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { authService } from '@/services/authService'
 import type { UserDto } from '@/dtos/authDtos'
 
@@ -20,19 +20,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!token) { setLoading(false); return }
     authService.me()
       .then(data => setUser(data))
-      .catch(() => localStorage.removeItem('aceso_token'))
+      .catch(() => {
+        localStorage.removeItem('aceso_token')
+        setUser(null)
+      })
       .finally(() => setLoading(false))
   }, [])
 
-  function logout() {
+  const logout = useCallback(() => {
     localStorage.removeItem('aceso_token')
     setUser(null)
-    window.location.href = '/login'
-  }
+  }, [])
 
-  function setToken(token: string) {
+  const setToken = useCallback((token: string) => {
     localStorage.setItem('aceso_token', token)
-  }
+    setLoading(true)
+    authService.me()
+      .then(data => setUser(data))
+      .catch(() => {
+        localStorage.removeItem('aceso_token')
+        setUser(null)
+      })
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user, loading, logout, setToken }}>

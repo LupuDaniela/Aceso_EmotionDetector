@@ -1,0 +1,16 @@
+.root { max-width: 640px; }
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2D2640;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 2px 16px rgba(139, 110, 197, 0.10);
+  border: 1px solid rgba(139, 110, 197, 0.08);
+}

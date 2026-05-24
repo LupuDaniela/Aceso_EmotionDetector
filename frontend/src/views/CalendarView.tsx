@@ -1,20 +1,14 @@
-import MoodCalendar        from '@/components/calendar/MoodCalendar'
-import Card, { CardTitle } from '@/components/card/Card'
-import { MONTHS_RO }       from '@/constants/calendar'
+import MoodCalendar from '@/components/calendar/MoodCalendar'
 import type { CalendarProps } from '@/types'
+import styles from './CalendarView.module.css'
 
-interface Props extends CalendarProps {
-  currentYear:  number
-  currentMonth: number
-}
-
-export default function CalendarView(props: Props) {
+export default function CalendarView(props: CalendarProps) {
   return (
-    <Card>
-      <CardTitle>
-        📅 {MONTHS_RO[props.currentMonth]} {props.currentYear}
-      </CardTitle>
-      <MoodCalendar {...props} showLegend />
-    </Card>
+    <div className={styles.root}>
+      <h1 className={styles.title}>📅 Calendar dispoziție</h1>
+      <div className={styles.card}>
+        <MoodCalendar {...props} showLegend light />
+      </div>
+    </div>
   )
 }

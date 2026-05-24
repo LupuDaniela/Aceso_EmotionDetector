@@ -27,15 +27,8 @@
   font-family: inherit;
 }
 
-.navBtn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.20);
-  color: #fff;
-}
-
-.navBtn:disabled {
-  opacity: 0.22;
-  cursor: default;
-}
+.navBtn:hover:not(:disabled) { background: rgba(255,255,255,0.20); color: #fff; }
+.navBtn:disabled { opacity: 0.22; cursor: default; }
 
 .monthLabel {
   display: flex;
@@ -58,11 +51,7 @@
   cursor: pointer;
   transition: background 0.18s;
 }
-
-.todayBtn:hover {
-  background: rgba(255,255,255,0.24);
-  color: #fff;
-}
+.todayBtn:hover { background: rgba(255,255,255,0.24); color: #fff; }
 
 .grid {
   display: grid;
@@ -91,37 +80,13 @@
   transition: transform 0.14s ease;
 }
 
-.past {
-  background: rgba(255,255,255,0.07);
-  cursor: pointer;
-}
-
-.past:hover {
-  transform: scale(1.10);
-  background: rgba(255,255,255,0.14);
-}
-
-.past:hover .addHint {
-  opacity: 1;
-}
-
-.future {
-  background: rgba(255,255,255,0.03);
-  cursor: default;
-  opacity: 0.30;
-}
-
-.hasMood {
-  cursor: pointer;
-}
-
-.hasMood:hover {
-  transform: scale(1.10);
-}
-
-.today {
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.65);
-}
+.past { background: rgba(255,255,255,0.07); cursor: pointer; }
+.past:hover { transform: scale(1.10); background: rgba(255,255,255,0.14); }
+.past:hover .addHint { opacity: 1; }
+.future { background: rgba(255,255,255,0.03); cursor: default; opacity: 0.30; }
+.hasMood { cursor: pointer; }
+.hasMood:hover { transform: scale(1.10); }
+.today { box-shadow: 0 0 0 2px rgba(255,255,255,0.65); }
 
 .num   { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); }
 .emoji { font-size: 18px; line-height: 1; }
@@ -146,11 +111,7 @@
   border-top: 1px solid rgba(255,255,255,0.10);
 }
 
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.legendItem { display: flex; align-items: center; gap: 6px; }
 
 .legendDot {
   width: 26px;
@@ -163,7 +124,28 @@
   flex-shrink: 0;
 }
 
-.legendLabel {
-  font-size: 10.5px;
-  color: rgba(255,255,255,0.58);
+.legendLabel { font-size: 10.5px; color: rgba(255,255,255,0.58); }
+
+/* ── Light theme ────────────────────────────────────────── */
+.light .navBtn {
+  background: rgba(139, 110, 197, 0.08);
+  color: var(--accent, #8B6EC5);
 }
+.light .navBtn:hover:not(:disabled) {
+  background: rgba(139, 110, 197, 0.16);
+  color: var(--accent-dark, #7050A8);
+}
+.light .monthLabel { color: #2D2640; }
+.light .todayBtn {
+  background: var(--accent-light, #EDE8F8);
+  color: var(--accent, #8B6EC5);
+}
+.light .weekday { color: #A098BC; }
+.light .past { background: rgba(139, 110, 197, 0.06); }
+.light .past:hover { background: rgba(139, 110, 197, 0.14); }
+.light .future { background: rgba(139, 110, 197, 0.02); }
+.light .num { color: #6B6280; }
+.light .today { box-shadow: 0 0 0 2px var(--accent, #8B6EC5); }
+.light .addHint { color: rgba(139, 110, 197, 0.4); }
+.light .legend { border-top-color: rgba(139, 110, 197, 0.10); }
+.light .legendLabel { color: #6B6280; }

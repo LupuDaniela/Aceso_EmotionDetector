@@ -1,14 +1,80 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 4px;
 }
 
 .statCard {
-  background: rgba(255,255,255,0.10);
+  background: var(--accent-light, #EDE8F8);
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 16px;
 }
 
-.val { font-size: 26px; font-weight: 800; color: #fff; }
-.lbl { font-size: 11px; color: rgba(255,255,255,0.58); margin-top: 3px; }
+.val {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent, #8B6EC5);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.lbl {
+  font-size: 12px;
+  color: #6B6280;
+  font-weight: 500;
+}
+
+.chartList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chartRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chartLabel {
+  width: 140px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D2640;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chartBarBg {
+  flex: 1;
+  height: 12px;
+  background: rgba(139,110,197,0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.chartBarFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s ease;
+  min-width: 4px;
+}
+
+.chartCount {
+  width: 28px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6B6280;
+  flex-shrink: 0;
+}
+
+.chartNote {
+  font-size: 11px;
+  color: #A098BC;
+  margin-top: 12px;
+  font-style: italic;
+}

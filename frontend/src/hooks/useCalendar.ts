@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from 'react'
-import { toDateKey, getDaysInMonth } from '@/utils/date'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { toDateKey } from '@/utils/date'
 import type { MoodKey, CalendarProps } from '@/types'
 
 type MoodLog = Record<string, MoodKey>
@@ -7,17 +7,26 @@ type MoodLog = Record<string, MoodKey>
 function calculateStreak(moodLog: MoodLog): number {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const cursor = new Date(today)
 
-  if (!moodLog[toDateKey(cursor)]) {
-    cursor.setDate(cursor.getDate() - 1)
-  }
+  const todayKey     = toDateKey(today)
+  const yesterdayKey = toDateKey(new Date(today.getTime() - 86400000))
 
-  let streak = 0
+  const startKey = moodLog[todayKey]
+    ? todayKey
+    : moodLog[yesterdayKey]
+    ? yesterdayKey
+    : null
+
+  if (!startKey) return 0
+
+  const cursor = new Date(startKey)
+  let streak   = 0
+
   while (moodLog[toDateKey(cursor)]) {
     streak++
     cursor.setDate(cursor.getDate() - 1)
   }
+
   return streak
 }
 
@@ -25,20 +34,31 @@ export interface UseCalendarReturn extends CalendarProps {
   streak: number
 }
 
-export function useCalendar(storageKey = 'aceso_mood_log'): UseCalendarReturn {
-  const [moodLog, setMoodLog] = useState<MoodLog>(() => {
-    try {
-      const raw = localStorage.getItem(storageKey)
-      return raw ? (JSON.parse(raw) as MoodLog) : {}
-    } catch {
-      return {}
-    }
-  })
-
+export function useCalendar(userId: string | number | null | undefined): UseCalendarReturn {
+  const [moodLog, setMoodLog] = useState<MoodLog>({})
   const [calView, setCalView] = useState(() => {
     const now = new Date()
     return { year: now.getFullYear(), month: now.getMonth() }
   })
+
+  useEffect(() => {
+    if (!userId) {
+      setMoodLog({})
+      return
+    }
+
+    const token = localStorage.getItem('aceso_token')
+    if (!token) return
+
+    setMoodLog({})
+
+    fetch('/api/moods', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : {})
+      .then((data: MoodLog) => setMoodLog(data))
+      .catch(() => {})
+  }, [userId])
 
   const streak = useMemo(() => calculateStreak(moodLog), [moodLog])
 
@@ -51,21 +71,32 @@ export function useCalendar(storageKey = 'aceso_mood_log'): UseCalendarReturn {
   }, [calView])
 
   const onLogMood = useCallback((dateKey: string, mood: MoodKey) => {
-    setMoodLog(prev => {
-      const next = { ...prev, [dateKey]: mood }
-      localStorage.setItem(storageKey, JSON.stringify(next))
-      return next
-    })
-  }, [storageKey])
+    setMoodLog(prev => ({ ...prev, [dateKey]: mood }))
+    const token = localStorage.getItem('aceso_token')
+    if (!token) return
+    fetch('/api/moods', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ date_key: dateKey, mood_key: mood }),
+    }).catch(() => {})
+  }, [])
 
   const onRemoveMood = useCallback((dateKey: string) => {
     setMoodLog(prev => {
       const next = { ...prev }
       delete next[dateKey]
-      localStorage.setItem(storageKey, JSON.stringify(next))
       return next
     })
-  }, [storageKey])
+    const token = localStorage.getItem('aceso_token')
+    if (!token) return
+    fetch(`/api/moods/${dateKey}`, {
+      method:  'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    }).catch(() => {})
+  }, [])
 
   const onPrevMonth = useCallback(() => {
     setCalView(({ year, month }) =>

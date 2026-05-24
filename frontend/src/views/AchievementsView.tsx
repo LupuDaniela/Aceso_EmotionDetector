@@ -1,43 +1,52 @@
-import AchievementsGrid    from '@/components/achievements/AchievementsGrid'
-import Card, { CardTitle } from '@/components/card/Card'
-import { ACHIEVEMENTS }    from '@/constants/achievements'
+import { ACHIEVEMENTS } from '@/constants/achievements'
 import type { AchievementConfig } from '@/types'
-import styles from '../views/Achievements.module.css'
+import styles from './Achievements.module.css'
 
 interface Props {
-  streak:       number
   unlockedAchs: AchievementConfig[]
+  streak:       number
 }
 
-export default function AchievementsView({ streak, unlockedAchs }: Props) {
-  return (
-    <>
-      <Card>
-        <CardTitle>🏆 Realizări &amp; Avataruri</CardTitle>
-        <AchievementsGrid unlockedAchs={unlockedAchs} />
-      </Card>
+export default function AchievementsView({ unlockedAchs, streak }: Props) {
+  const unlockedDays = new Set(unlockedAchs.map(a => a.days))
 
-      <Card>
-        <CardTitle>ℹ️ Cum deblochezi avataruri</CardTitle>
-        <div className={styles.list}>
-          {ACHIEVEMENTS.map(a => {
-            const done = streak >= a.days
-            return (
+  return (
+    <div className={styles.root}>
+      <h1 className={styles.title}>🏆 Realizări & Avataruri</h1>
+
+      <div className={styles.grid}>
+        {ACHIEVEMENTS.map(ach => {
+          const isUnlocked = unlockedDays.has(ach.days)
+          return (
+            <div key={ach.days} className={styles.item}>
               <div
-                key={a.days}
-                className={`${styles.row} ${done ? styles.done : ''}`}
+                className={[styles.slot, isUnlocked ? styles.unlocked : styles.locked].join(' ')}
+                title={isUnlocked ? ach.name : `Deblochează la ${ach.days} zile`}
               >
-                <span className={styles.check}>{done ? '✅' : '🔒'}</span>
-                <div>
-                  <span className={styles.label}>{a.label}</span>
-                  {' — '}
-                  <span className={styles.name}>{a.name}</span>
-                </div>
+                {isUnlocked
+                  ? <img src={ach.img} alt={ach.name} />
+                  : <span>🔒</span>
+                }
               </div>
-            )
-          })}
-        </div>
-      </Card>
-    </>
+              <span className={styles.label}>{ach.label}</span>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className={styles.infoCard}>
+        <p className={styles.infoTitle}>ℹ️ Cum deblochezi avataruri</p>
+        {ACHIEVEMENTS.map(ach => (
+          <div key={ach.days} className={styles.infoItem}>
+            <span className={styles.infoIcon}>
+              {unlockedDays.has(ach.days) ? '✅' : '🔒'}
+            </span>
+            <span className={styles.infoText}>
+              {ach.days} zile — <span className={styles.infoName}>{ach.name}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

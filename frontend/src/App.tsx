@@ -2,10 +2,14 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage    from '@/pages/login/LoginPage'
 import RegisterPage from '@/pages/register/RegisterPage'
 import Dashboard    from '@/pages/dashboard/Dashboard'
+import { useAuth }  from '@/hooks/useAuth'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
   const token = localStorage.getItem('aceso_token')
-  return token ? <>{children}</> : <Navigate to="/login" replace />
+
+  if (loading) return null
+  return (user || token) ? <>{children}</> : <Navigate to="/login" replace />
 }
 
 export default function App() {

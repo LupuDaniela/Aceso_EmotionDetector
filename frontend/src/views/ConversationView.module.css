@@ -1,0 +1,240 @@
+.root {
+  position: fixed;
+  top: 0;
+  left: 220px;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 10;
+}
+
+.bgOverlay { display: none; }
+
+.chatWrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 680px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 28px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.header {
+  padding-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2D2640;
+  margin-bottom: 4px;
+}
+
+.subtitle { font-size: 13px; color: #6B6280; }
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 2px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139,110,197,0.2) transparent;
+}
+
+.messages::-webkit-scrollbar { width: 4px; }
+.messages::-webkit-scrollbar-thumb {
+  background: rgba(139,110,197,0.2);
+  border-radius: 10px;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #6B6280;
+  font-size: 14px;
+  text-align: center;
+  padding: 60px 0;
+}
+
+.emptyIcon { font-size: 48px; opacity: 0.7; }
+
+.msgRow    { display: flex; }
+.user      { justify-content: flex-end; }
+.assistant { justify-content: flex-start; }
+
+.userBubble {
+  color: #fff;
+  border-radius: 20px 20px 4px 20px;
+  padding: 12px 18px;
+  max-width: 72%;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.assistantCard {
+  background: rgba(255,255,255,0.88);
+  border: 1.5px solid;
+  border-radius: 4px 20px 20px 20px;
+  padding: 16px 18px;
+  max-width: 82%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.emotionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.emotionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.emotionScore {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-left: 2px;
+}
+
+.diadaBadge {
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.assistantText {
+  font-size: 14px;
+  color: #2D2640;
+  line-height: 1.6;
+}
+
+.scoresRow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(139,110,197,0.10);
+}
+
+.scoreItem { display: flex; align-items: center; gap: 8px; }
+.scoreEmoji { font-size: 14px; width: 20px; text-align: center; }
+
+.scoreBar {
+  flex: 1;
+  height: 6px;
+  background: rgba(139,110,197,0.10);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.scoreFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.scoreVal { font-size: 11px; color: #A098BC; width: 30px; text-align: right; }
+
+.typing {
+  display: flex;
+  gap: 5px;
+  padding: 4px 0;
+}
+
+.typing span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%            { transform: translateY(-6px); opacity: 1; }
+}
+
+.inputArea {
+  flex-shrink: 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(139,110,197,0.12);
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  border: 1.5px solid rgba(139,110,197,0.25);
+  border-radius: 16px;
+  padding: 12px 52px 12px 16px;
+  font-size: 14px;
+  color: #2D2640;
+  background: rgba(255,255,255,0.90);
+  resize: none;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+  outline: none;
+  font-family: inherit;
+}
+
+.textarea::placeholder { color: #A098BC; }
+
+.sendBtn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-size: 16px;
+  color: #fff;
+}
+
+.sendBtn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.sendBtn:disabled { opacity: 0.35; cursor: default; }
