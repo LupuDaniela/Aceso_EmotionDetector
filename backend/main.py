@@ -2,6 +2,7 @@ import os
 import importlib.util
 import pathlib
 from contextlib import asynccontextmanager
+from datetime import date
 from typing import Optional
 
 from fastapi import FastAPI, Depends, HTTPException
@@ -14,6 +15,23 @@ from auth.jwt_utils import verifica_token
 from pipeline       import AcesoPipeline
 
 pipeline: Optional[AcesoPipeline] = None
+
+# Mapare emotii romanesti (pipeline) -> mood_key (frontend)
+EMOTIE_TO_MOOD: dict[str, str] = {
+    'Bucurie':    'joy',
+    'Tristete':   'sadness',
+    'Tristețe':   'sadness',
+    'Frica':      'fear',
+    'Frică':      'fear',
+    'Furie':      'anger',
+    'Surpriza':   'surprise',
+    'Surpriză':   'surprise',
+    'Incredere':  'trust',
+    'Încredere':  'trust',
+    'Anticipare': 'anticipation',
+    'Dezgust':    'disgust',
+    'Neutru':     'neutral',
+}
 
 
 @asynccontextmanager
@@ -60,11 +78,22 @@ def analyze(req: TextRequest, user=Depends(verifica_token)):
     if not req.text.strip():
         raise HTTPException(400, "Textul nu poate fi gol.")
 
-    rezultat = pipeline.analizeaza(
-        req.text,
-        salveaza=req.salveaza,
-        user_id=int(user["sub"])
-    )
+    user_id  = int(user["sub"])
+    rezultat = pipeline.analizeaza(req.text, salveaza=req.salveaza, user_id=user_id)
+
+    # Salveaza automat emotia dominanta in calendar pentru ziua de azi
+    mood_key = EMOTIE_TO_MOOD.get(rezultat.get("emotie_dominanta", ""), "neutral")
+    date_key = date.today().isoformat()   # "2026-05-26"
+    try:
+        conn   = get_conn(); cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO mood_log (user_id, date_key, mood_key)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (user_id, date_key) DO NOTHING
+        """, (user_id, date_key, mood_key))
+        conn.commit(); cursor.close(); conn.close()
+    except Exception as e:
+        print(f"[mood_log auto-save] {e}")
 
     raspuns = ""
     try:
@@ -93,43 +122,35 @@ def history(limit: int = 20, user=Depends(verifica_token)):
 
 @app.get("/api/moods")
 def get_moods(user=Depends(verifica_token)):
-    conn   = get_conn()
-    cursor = conn.cursor()
+    conn   = get_conn(); cursor = conn.cursor()
     cursor.execute(
         "SELECT date_key, mood_key FROM mood_log WHERE user_id = %s",
         (int(user["sub"]),)
     )
     rows = cursor.fetchall()
-    cursor.close()
-    conn.close()
+    cursor.close(); conn.close()
     return {row[0]: row[1] for row in rows}
 
 
 @app.post("/api/moods")
 def log_mood(req: MoodRequest, user=Depends(verifica_token)):
-    conn   = get_conn()
-    cursor = conn.cursor()
+    conn   = get_conn(); cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO mood_log (user_id, date_key, mood_key)
         VALUES (%s, %s, %s)
         ON CONFLICT (user_id, date_key)
         DO UPDATE SET mood_key = EXCLUDED.mood_key
     """, (int(user["sub"]), req.date_key, req.mood_key))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    conn.commit(); cursor.close(); conn.close()
     return {"ok": True}
 
 
 @app.delete("/api/moods/{date_key}")
 def delete_mood(date_key: str, user=Depends(verifica_token)):
-    conn   = get_conn()
-    cursor = conn.cursor()
+    conn   = get_conn(); cursor = conn.cursor()
     cursor.execute(
         "DELETE FROM mood_log WHERE user_id = %s AND date_key = %s",
         (int(user["sub"]), date_key)
     )
-    conn.commit()
-    cursor.close()
-    conn.close()
+    conn.commit(); cursor.close(); conn.close()
     return {"ok": True}

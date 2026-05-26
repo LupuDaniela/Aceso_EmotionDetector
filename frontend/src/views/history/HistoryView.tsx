@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { AcesoTheme } from '../constants/themes'
+import type { AcesoTheme } from '../../constants/themes'
 import styles from './HistoryView.module.css'
 
 interface ConvItem {

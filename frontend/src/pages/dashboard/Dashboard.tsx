@@ -2,13 +2,13 @@ import { useEffect } from 'react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { useAuth } from '@/hooks/useAuth'
 import Sidebar from '@/components/sidebar/Sidebar'
-import HomeView from '../../views/HomeView'
-import StatsView from '../../views/StatsView'
-import CalendarView from '../../views/CalendarView'
-import AchievementsView from '../../views/AchievementsView'
-import SettingsView from '../../views/SettingsView'
-import ConversationView from '../../views/ConversationView'
-import HistoryView from '../../views/HistoryView'
+import HomeView from '../../views/home/HomeView'
+import StatsView from '../../views/statistics/StatsView'
+import CalendarView from '../../views/calendar/CalendarView'
+import AchievementsView from '../../views/achievements/AchievementsView'
+import SettingsView from '../../views/settings/SettingsView'
+import ConversationView from '../../views/conversation/ConversationView'
+import HistoryView from '../../views/history/HistoryView'
 import ScenePanel from '@/components/scene/ScenePanel'
 import styles from './Dashboard.module.css'
 
@@ -71,6 +71,9 @@ export default function Dashboard() {
             <ConversationView
               theme={theme}
               onLogMood={calendar.onLogMood}
+              currentCharacter={currentCharacter}
+              userName={user?.name || ''}
+              unlockedAchs={unlockedAchs}
             />
           )}
           {activeView === 'history' && (

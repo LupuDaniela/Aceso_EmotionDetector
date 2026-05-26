@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { authService } from '../../services/authService'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './LoginPage.module.css'
 import logoAceso from '../../assets/logo_aceso.png'
 import authImage from '../../assets/photo_auth.png'
@@ -32,7 +33,9 @@ function EyeIcon({ open }: { open: boolean }) {
 }
 
 export default function LoginPage() {
-  const navigate = useNavigate()
+  const navigate       = useNavigate()
+  const { setToken }   = useAuth()           // ← adaugat
+
   const [view,     setView]     = useState<View>('login')
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
@@ -51,11 +54,11 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search)
     const token  = params.get('token')
     if (token) {
-      localStorage.setItem('aceso_token', token)
+      setToken(token)                        // ← era localStorage.setItem
       window.history.replaceState({}, '', '/auth/callback')
       navigate('/dashboard', { replace: true })
     }
-  }, [navigate])
+  }, [navigate, setToken])
 
   function switchView(next: View) {
     setError(''); setSuccess(''); setPassword('')
@@ -67,7 +70,7 @@ export default function LoginPage() {
     setError(''); setLoading(true)
     try {
       const data = await authService.login({ email, password })
-      localStorage.setItem('aceso_token', data.access_token)
+      setToken(data.access_token)            // ← era localStorage.setItem
       navigate('/dashboard', { replace: true })
     } catch (err) {
       setError((err as Error).message)
