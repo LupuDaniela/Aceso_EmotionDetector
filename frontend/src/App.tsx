@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import LoginPage    from '@/pages/login/LoginPage'
-import RegisterPage from '@/pages/register/RegisterPage'
-import Dashboard    from '@/pages/dashboard/Dashboard'
-import { useAuth }  from '@/hooks/useAuth'
+import LoginPage         from '@/pages/login/LoginPage'
+import RegisterPage      from '@/pages/register/RegisterPage'
+import ResetPasswordPage from '@/pages/reset/ResetPasswordPage'
+import Dashboard         from '@/pages/dashboard/Dashboard'
+import { useAuth }       from '@/hooks/useAuth'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -15,9 +16,10 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
-      <Route path="/login"         element={<LoginPage />} />
-      <Route path="/register"      element={<RegisterPage />} />
-      <Route path="/auth/callback" element={<LoginPage />} />
+      <Route path="/login"          element={<LoginPage />} />
+      <Route path="/register"       element={<RegisterPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/auth/callback"  element={<LoginPage />} />
       <Route
         path="/dashboard"
         element={

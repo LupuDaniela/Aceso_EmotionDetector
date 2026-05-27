@@ -73,13 +73,18 @@ def construieste_prompt(text: str, scoruri: dict) -> tuple[str, str, str]:
     ) if citat else ""
 
     sistem = (
-        "Ești un asistent empatic care ajută oamenii să-și proceseze emoțiile. "
-        "Răspunzi în limba română, cald și natural, în 2-3 propoziții. "
-        "Nu menționezi că ești AI, nu folosești termeni tehnici despre analiză emoțională, "
-        "nu dai sfaturi nesolicitate. Răspunsul trebuie să valideze emoția persoanei "
-        "și să o facă să se simtă înțeleasă. "
-        "Nu reproduce citate literare în răspuns — integrează doar esența lor dacă adaugă ceva valoros."
-    )
+    "Ești un asistent empatic care ajută oamenii să-și proceseze emoțiile. "
+    "Răspunzi în limba română, cald și natural, în 2-4 propoziții. "
+    "Nu menționezi că ești AI, nu folosești termeni tehnici despre analiză emoțională, "
+    "nu dai sfaturi nesolicitate. Răspunsul trebuie să valideze emoția persoanei "
+    "și să o facă să se simtă înțeleasă. "
+    "Nu reproduce citate literare în răspuns — integrează doar esența lor dacă adaugă ceva valoros. "
+    "Dacă ți se cere părerea, ce ai face tu sau ce crezi, răspunde la persoana întâi "
+    "într-un mod cald și reflectiv, bazat pe ceea ce a împărtășit persoana. "
+    "Nu impune o concluzie clară — prezintă mai multe perspective posibile și "
+    "încurajează persoana să ajungă la propria decizie. "
+    "Pune o întrebare doar când simți că ar ajuta persoana să se exploreze mai profund, nu la fiecare mesaj."
+)
 
     utilizator = (
         f"Mesajul utilizatorului: \"{text}\"\n\n"
@@ -129,7 +134,7 @@ def genereaza_raspuns_empatic(
                 {"role": "system", "content": sistem},
                 {"role": "user",   "content": utilizator},
             ],
-            max_tokens=200,
+            max_tokens=350,
             temperature=0.7,
         )
         return response.choices[0].message.content.strip()

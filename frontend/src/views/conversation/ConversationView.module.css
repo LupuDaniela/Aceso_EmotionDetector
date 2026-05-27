@@ -243,6 +243,7 @@
 }
 
 .sendBtn:disabled { opacity: 0.35; cursor: default; }
+
 .motto {
   text-align: center;
   font-size: 13px;
@@ -251,10 +252,6 @@
   line-height: 1.7;
   margin: 0;
   padding: 4px 0 8px;
-}
-
-.empty {
-  flex: 1;
 }
 
 .avatar {
@@ -296,13 +293,8 @@
 
 .inputRow {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 10px;
-}
-
-.charSlot {
-  position: relative;
-  flex-shrink: 0;
 }
 
 .charSlotEmpty {
@@ -310,12 +302,46 @@
   flex-shrink: 0;
 }
 
+.charSlot {
+  position: relative;
+  flex-shrink: 0;
+}
+
+
+.charTooltip {
+  position: absolute;
+  bottom: calc(100% - 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(139, 110, 197, 0.25);
+  border-radius: 10px;
+  padding: 5px 1px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B6280;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.charTooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(255, 255, 255, 0.92);
+}
+
 .charBtn {
   width: 72px;
   height: 90px;
   border-radius: 16px;
-  border: 1.5px solid rgba(139,110,197,0.25);
-  background: rgba(255,255,255,0.90);
+  border: none;
+  background: transparent;
   padding: 8px 6px;
   cursor: pointer;
   display: flex;
@@ -323,27 +349,25 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.15s;
-  box-shadow: none;
   flex-shrink: 0;
-  margin-bottom: 0;
+}
+
+.centerChar {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  position: relative;   
 }
 
 .charBtn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.16);
 }
 
 .charBtn img {
   width: 58px;
   height: 58px;
   object-fit: contain;
-}
-
-.charHint {
-  font-size: 9px;
-  color: rgba(45,38,64,0.45);
-  line-height: 1;
-  margin-top: 1px;
 }
 
 .charPicker {

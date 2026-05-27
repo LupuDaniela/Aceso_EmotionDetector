@@ -13,6 +13,108 @@
   margin-bottom: 14px;
 }
 
+/* Profile */
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profileField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.profileLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B6280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profileInput {
+  padding: 10px 14px;
+  border: 1.5px solid rgba(139, 110, 197, 0.25);
+  border-radius: 10px;
+  font-size: 14px;
+  color: #2D2640;
+  background: #fff;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.profileInput:focus {
+  border-color: var(--accent, #8B6EC5);
+  box-shadow: 0 0 0 3px rgba(139, 110, 197, 0.10);
+}
+
+.profileError {
+  font-size: 13px;
+  color: #C0392B;
+  background: #FDEAEA;
+  border: 1px solid #F5C6C6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0;
+}
+
+.profileSuccess {
+  font-size: 13px;
+  color: #27AE60;
+  background: #EAF5EE;
+  border: 1px solid #B2DFCB;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0;
+}
+
+.profileActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btnSave {
+  flex: 1;
+  padding: 10px 16px;
+  background: var(--accent, #8B6EC5);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.btnSave:hover:not(:disabled) { opacity: 0.88; }
+.btnSave:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btnChangePass {
+  padding: 10px 16px;
+  background: #fff;
+  color: #6B6280;
+  border: 1.5px solid rgba(139, 110, 197, 0.25);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btnChangePass:hover {
+  border-color: var(--accent, #8B6EC5);
+  color: var(--accent, #8B6EC5);
+}
+
+
 .themePicker {
   display: flex;
   flex-wrap: wrap;
@@ -45,6 +147,7 @@
   border-color: var(--btn-accent);
   background: color-mix(in srgb, var(--btn-accent) 8%, white);
   color: var(--btn-accent);
+  box-shadow: 0 0 0 2px var(--btn-accent);  /* ← adaugă asta */
 }
 
 .themeBtnPreview {

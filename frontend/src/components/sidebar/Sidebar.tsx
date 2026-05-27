@@ -1,50 +1,49 @@
-import logo from '@/assets/logo_aceso.png'
-import type { NavView, AchievementConfig } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
+import logoAceso from '@/assets/logo_aceso.png'
+import type { NavView, AchievementConfig } from '@/types'
 import styles from './Sidebar.module.css'
+
+interface NavItem { view: NavView; icon: string; label: string }
+
+const NAV_ITEMS: NavItem[] = [
+  { view: 'home',         icon: '🏠', label: 'Acasă'            },
+  { view: 'conversation', icon: '💬', label: 'Conversație nouă' },
+  { view: 'history',      icon: '📜', label: 'Istoric'           },
+  { view: 'stats',        icon: '📊', label: 'Statistici'        },
+  { view: 'calendar',     icon: '📅', label: 'Calendar'          },
+  { view: 'achievements', icon: '🏆', label: 'Realizări'         },
+  { view: 'settings',     icon: '⚙️',  label: 'Setări'            },
+]
 
 interface Props {
   activeView:       NavView
-  onView:           (v: NavView) => void
+  onView:           (view: NavView) => void
   streak:           number
   currentCharacter: AchievementConfig | null
 }
-
-const NAV_ITEMS: { id: NavView; icon: string; label: string }[] = [
-  { id: 'home',         icon: '🏠', label: 'Acasă' },
-  { id: 'conversation', icon: '💬', label: 'Conversație nouă' },
-  { id: 'history',      icon: '📜', label: 'Conversații avute' },
-  { id: 'stats',        icon: '📊', label: 'Statistici' },
-  { id: 'calendar',     icon: '📅', label: 'Calendar dispoziție' },
-  { id: 'achievements', icon: '🏆', label: 'Realizări & Avataruri' },
-  { id: 'settings',     icon: '⚙️', label: 'Setări' },
-]
 
 export default function Sidebar({ activeView, onView, streak, currentCharacter }: Props) {
   const { logout } = useAuth()
 
   return (
-    <aside className={styles.sidebar}>
+    <nav className={styles.sidebar}>
       <div className={styles.logo}>
-        <img src={logo} alt="Aceso" className={styles.logoImg} />
+        <img src={logoAceso} alt="Aceso" className={styles.logoImg} />
       </div>
 
-      <nav className={styles.nav}>
-        {NAV_ITEMS.map(item => (
+      <div className={styles.nav}>
+        {NAV_ITEMS.map(({ view, icon, label }) => (
           <button
-            key={item.id}
+            key={view}
             type="button"
-            className={[
-              styles.navItem,
-              activeView === item.id ? styles.active : '',
-            ].filter(Boolean).join(' ')}
-            onClick={() => onView(item.id)}
+            className={`${styles.navItem} ${activeView === view ? styles.active : ''}`}
+            onClick={() => onView(view)}
           >
-            <span className={styles.navIcon}>{item.icon}</span>
-            <span className={styles.navLabel}>{item.label}</span>
+            <span className={styles.navIcon}>{icon}</span>
+            <span className={styles.navLabel}>{label}</span>
           </button>
         ))}
-      </nav>
+      </div>
 
       <div className={styles.spacer} />
 
@@ -52,8 +51,8 @@ export default function Sidebar({ activeView, onView, streak, currentCharacter }
         <div className={styles.currentAch}>
           <img src={currentCharacter.img} alt={currentCharacter.name} className={styles.achImg} />
           <div>
-            <p className={styles.achName}>{currentCharacter.name}</p>
-            <p className={styles.achStreak}>🔥 {streak} zile</p>
+            <div className={styles.achName}>{currentCharacter.name}</div>
+            <div className={styles.achStreak}>🔥 {streak} zile</div>
           </div>
         </div>
       )}
@@ -61,8 +60,7 @@ export default function Sidebar({ activeView, onView, streak, currentCharacter }
       <button type="button" className={styles.logoutBtn} onClick={logout}>
         Deconectare
       </button>
-
       <p className={styles.version}>Aceso EmotionDetector v1.0</p>
-    </aside>
+    </nav>
   )
 }

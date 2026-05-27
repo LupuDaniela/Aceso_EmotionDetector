@@ -1,13 +1,13 @@
-import { ACHIEVEMENTS } from '@/constants/achievements'
+import { ACHIEVEMENTS }    from '@/constants/achievements'
 import type { AchievementConfig } from '@/types'
 import styles from './Achievements.module.css'
 
 interface Props {
-  unlockedAchs: AchievementConfig[]
   streak:       number
+  unlockedAchs: AchievementConfig[]
 }
 
-export default function AchievementsView({ unlockedAchs, streak }: Props) {
+export default function AchievementsView({ streak, unlockedAchs }: Props) {
   const unlockedDays = new Set(unlockedAchs.map(a => a.days))
 
   return (
@@ -20,7 +20,7 @@ export default function AchievementsView({ unlockedAchs, streak }: Props) {
           return (
             <div key={ach.days} className={styles.item}>
               <div
-                className={[styles.slot, isUnlocked ? styles.unlocked : styles.locked].join(' ')}
+                className={`${styles.slot} ${isUnlocked ? styles.unlocked : styles.locked}`}
                 title={isUnlocked ? ach.name : `Deblochează la ${ach.days} zile`}
               >
                 {isUnlocked
@@ -35,14 +35,12 @@ export default function AchievementsView({ unlockedAchs, streak }: Props) {
       </div>
 
       <div className={styles.infoCard}>
-        <p className={styles.infoTitle}>ℹ️ Cum deblochezi avataruri</p>
-        {ACHIEVEMENTS.map(ach => (
-          <div key={ach.days} className={styles.infoItem}>
-            <span className={styles.infoIcon}>
-              {unlockedDays.has(ach.days) ? '✅' : '🔒'}
-            </span>
+        <p className={styles.infoTitle}>Cum deblochezi avataruri</p>
+        {ACHIEVEMENTS.map(a => (
+          <div key={a.days} className={styles.infoItem}>
+            <span className={styles.infoIcon}>{streak >= a.days ? '✅' : '🔒'}</span>
             <span className={styles.infoText}>
-              {ach.days} zile — <span className={styles.infoName}>{ach.name}</span>
+              {a.label} — <span className={styles.infoName}>{a.name}</span>
             </span>
           </div>
         ))}

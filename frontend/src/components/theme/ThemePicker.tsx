@@ -1,28 +1,30 @@
-import { THEMES } from '@/constants/themes'
-import type { ThemeKey } from '@/types'
+import { THEMES }           from '@/constants/themes'
+import type { ThemeId, AcesoTheme } from '@/constants/themes'
 import styles from './ThemePicker.module.css'
 
 interface Props {
-  current:  ThemeKey
-  onSelect: (key: ThemeKey) => void
+  current:  ThemeId
+  onSelect: (id: ThemeId) => void
 }
 
 export default function ThemePicker({ current, onSelect }: Props) {
+  const themes = Object.values(THEMES) as AcesoTheme[]
+
   return (
     <div className={styles.grid} role="radiogroup" aria-label="Selectează tema">
-      {THEMES.map(t => (
-        <div key={t.key} className={styles.item}>
+      {themes.map(t => (
+        <div key={t.id} className={styles.item}>
           <button
             type="button"
             role="radio"
-            aria-checked={current === t.key}
-            className={`${styles.btn} ${current === t.key ? styles.selected : ''}`}
-            onClick={() => onSelect(t.key)}
-            title={t.name}
+            aria-checked={current === t.id}
+            className={`${styles.btn} ${current === t.id ? styles.selected : ''}`}
+            onClick={() => onSelect(t.id)}
+            title={t.label}
           >
-            <img src={t.bg} alt="" aria-hidden="true" />
+            <img src={t.sceneImage} alt="" aria-hidden="true" />
           </button>
-          <span className={styles.label}>{t.name}</span>
+          <span className={styles.label}>{t.label}</span>
         </div>
       ))}
     </div>

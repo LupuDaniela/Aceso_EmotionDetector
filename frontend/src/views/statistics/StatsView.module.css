@@ -25,6 +25,17 @@
   font-weight: 500;
 }
 
+.radarWrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.areaWrap {
+  width: 100%;
+  padding-top: 4px;
+}
+
 .chartList {
   display: flex;
   flex-direction: column;

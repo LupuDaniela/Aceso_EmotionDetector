@@ -6,7 +6,7 @@ interface AuthContextType {
   user:     UserDto | null
   loading:  boolean
   logout:   () => void
-  setToken: (token: string) => void
+  setToken: (token: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -32,17 +32,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
   }, [])
 
-  const setToken = useCallback((token: string) => {
-    localStorage.setItem('aceso_token', token)
-    setLoading(true)
-    authService.me()
-      .then(data => setUser(data))
-      .catch(() => {
-        localStorage.removeItem('aceso_token')
-        setUser(null)
-      })
-      .finally(() => setLoading(false))
-  }, [])
+  const setToken = useCallback(async (token: string) => {
+  localStorage.setItem('aceso_token', token)
+  setLoading(true)
+  try {
+    const data = await authService.me()
+    setUser(data)
+  } catch {
+    localStorage.removeItem('aceso_token')
+    setUser(null)
+  } finally {
+    setLoading(false)
+  }
+}, [])
 
   return (
     <AuthContext.Provider value={{ user, loading, logout, setToken }}>

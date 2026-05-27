@@ -3,17 +3,17 @@
   min-width: 220px;
   height: 100vh;
   background: #ffffff;
-  border-right: 1px solid rgba(139, 110, 197, 0.10);
+  border-right: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);
   display: flex;
   flex-direction: column;
   padding: 20px 0 16px;
   flex-shrink: 0;
-  box-shadow: 2px 0 20px rgba(139, 110, 197, 0.06);
+  box-shadow: 2px 0 20px color-mix(in srgb, var(--accent) 6%, transparent);
 }
 
 .logo {
   padding: 0 20px 20px;
-  border-bottom: 1px solid rgba(139, 110, 197, 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 8%, transparent);
   margin-bottom: 12px;
   display: flex;
   justify-content: center;
@@ -82,14 +82,14 @@
   border-radius: 14px;
 }
 
-.achImg   { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
-.achName  { font-size: 12px; font-weight: 700; color: #2D2640; line-height: 1.2; }
+.achImg    { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.achName   { font-size: 12px; font-weight: 700; color: #2D2640; line-height: 1.2; }
 .achStreak { font-size: 11px; color: var(--accent, #8B6EC5); margin-top: 2px; }
 
 .logoutBtn {
   margin: 0 10px 8px;
   padding: 10px 12px;
-  border: 1.5px solid rgba(139, 110, 197, 0.25);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 25%, transparent);
   border-radius: 12px;
   background: transparent;
   font-family: inherit;
@@ -110,6 +110,6 @@
 .version {
   text-align: center;
   font-size: 10px;
-  color: #C4B8E8;
+  color: color-mix(in srgb, var(--accent) 50%, #aaaaaa);
   padding: 0 10px;
 }

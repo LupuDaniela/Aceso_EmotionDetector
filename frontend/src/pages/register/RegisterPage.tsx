@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { authService } from '../../services/authService'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './RegisterPage.module.css'
 import logoAceso from '../../assets/logo_aceso.png'
 import authImage from '../../assets/photo_auth.png'
@@ -30,7 +31,8 @@ function EyeIcon({ open }: { open: boolean }) {
 }
 
 export default function RegisterPage() {
-  const navigate = useNavigate()
+  const navigate       = useNavigate()
+  const { setToken }   = useAuth()
   const [name,     setName]     = useState('')
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
@@ -50,7 +52,7 @@ export default function RegisterPage() {
     setError(''); setLoading(true)
     try {
       const data = await authService.register({ email, name, password })
-      localStorage.setItem('aceso_token', data.access_token)
+      await setToken(data.access_token)
       navigate('/dashboard', { replace: true })
     } catch (err) {
       setError((err as Error).message)

@@ -20,11 +20,12 @@ interface Message {
 }
 
 interface Props {
-  theme:            AcesoTheme
-  onLogMood:        (dateKey: string, mood: MoodKey) => void
-  currentCharacter: AchievementConfig | null
-  unlockedAchs:     AchievementConfig[]
-  userName:         string
+  theme:             AcesoTheme
+  onLogMood:         (dateKey: string, mood: MoodKey) => void
+  currentCharacter:  AchievementConfig | null
+  unlockedAchs:      AchievementConfig[]
+  userName:          string
+  handleSelectChar?: (ach: AchievementConfig) => void
 }
 
 const EMOTIE_TO_MOOD: Record<string, MoodKey> = {
@@ -43,26 +44,37 @@ const EMOTIE_TO_MOOD: Record<string, MoodKey> = {
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/)
   if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? ''
-  const prenume = parts[0][0]?.toUpperCase() ?? ''
-  const nume    = parts[1][0]?.toUpperCase() ?? ''
-  return nume + prenume
+  return (parts[1][0]?.toUpperCase() ?? '') + (parts[0][0]?.toUpperCase() ?? '')
 }
 
-export default function ConversationView({ theme, onLogMood, currentCharacter, unlockedAchs, userName }: Props) {
+async function createThread(token: string): Promise<number | null> {
+  try {
+    const res = await fetch('/api/chat/thread', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body:    JSON.stringify({ titlu: null }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      return data.id as number
+    }
+  } catch {}
+  return null
+}
+
+export default function ConversationView({
+  theme, onLogMood, currentCharacter, unlockedAchs, userName, handleSelectChar,
+}: Props) {
   if (!theme) return null
 
-  const [messages,        setMessages]        = useState<Message[]>([])
-  const [input,           setInput]           = useState('')
-  const [loading,         setLoading]         = useState(false)
-  const [selectedChar,    setSelectedChar]    = useState<AchievementConfig | null>(currentCharacter)
-  const [showCharPicker,  setShowCharPicker]  = useState(false)
+  const [messages,       setMessages]       = useState<Message[]>([])
+  const [input,          setInput]          = useState('')
+  const [loading,        setLoading]        = useState(false)
+  const [showCharPicker, setShowCharPicker] = useState(false)
+  const [threadId,       setThreadId]       = useState<number | null>(null)
   const bottomRef   = useRef<HTMLDivElement>(null)
   const idRef       = useRef(0)
   const loggedToday = useRef(false)
-
-  useEffect(() => {
-    setSelectedChar(currentCharacter)
-  }, [currentCharacter])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -77,14 +89,18 @@ export default function ConversationView({ theme, onLogMood, currentCharacter, u
     setLoading(true)
 
     try {
-      const token = localStorage.getItem('aceso_token')
-      const res   = await fetch('/api/analyze', {
+      const token = localStorage.getItem('aceso_token') ?? ''
+
+      let tid = threadId
+      if (tid === null) {
+        tid = await createThread(token)
+        if (tid !== null) setThreadId(tid)
+      }
+
+      const res = await fetch('/api/chat/message', {
         method:  'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ text, salveaza: true }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body:    JSON.stringify({ text, thread_id: tid }),
       })
 
       if (!res.ok) throw new Error('Eroare server')
@@ -194,18 +210,22 @@ export default function ConversationView({ theme, onLogMood, currentCharacter, u
         <div className={styles.inputArea}>
           <div className={styles.inputRow}>
 
-            {selectedChar ? (
+            {currentCharacter ? (
               <div className={styles.charSlot}>
+                {!showCharPicker && (
+                  <div className={styles.charTooltip}>Alege un confident</div>
+                )}
                 <button
                   type="button"
                   className={styles.charBtn}
                   onClick={() => unlockedAchs.length > 1 && setShowCharPicker(p => !p)}
-                  title={unlockedAchs.length > 1 ? 'Alege personaj' : selectedChar.name}
+                  title={unlockedAchs.length > 1 ? 'Alege personaj' : currentCharacter.name}
                 >
-                  <img src={selectedChar.img} alt={selectedChar.name} />
-                  {unlockedAchs.length > 1 && (
-                    <span className={styles.charHint}>▲</span>
-                  )}
+                  <img
+                    src={currentCharacter.img}
+                    alt={currentCharacter.name}
+                    style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
                 </button>
 
                 {showCharPicker && (
@@ -216,9 +236,12 @@ export default function ConversationView({ theme, onLogMood, currentCharacter, u
                         type="button"
                         className={[
                           styles.charPickerItem,
-                          selectedChar.days === ach.days ? styles.charPickerActive : '',
+                          currentCharacter.days === ach.days ? styles.charPickerActive : '',
                         ].join(' ')}
-                        onClick={() => { setSelectedChar(ach); setShowCharPicker(false) }}
+                        onClick={() => {
+                          handleSelectChar?.(ach)
+                          setShowCharPicker(false)
+                        }}
                       >
                         <img src={ach.img} alt={ach.name} />
                         <span>{ach.name}</span>
