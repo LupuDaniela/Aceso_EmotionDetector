@@ -17,7 +17,7 @@ RUN pip install gdown
 
 COPY . .
 
-RUN gdown "1YmDOD28_TD62yXHQUX1cEGlmEMxDlZTc" -O models/best_model_3.pt
+RUN mkdir -p models && gdown "1YmDOD28_TD62yXHQUX1cEGlmEMxDlZTc" -O models/best_model_3.pt
 
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
