@@ -2,13 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y gcc libpq-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN python -m spacy download ro_core_news_lg
+RUN pip install gdown
 
 COPY . .
+
+RUN gdown "1YmDOD28_TD62yXHQUX1cEGlmEMxDlZTc" -O models/best_model_3.pt
 
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
