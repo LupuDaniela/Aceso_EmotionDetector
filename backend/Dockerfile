@@ -5,7 +5,14 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu || \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu || \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+RUN grep -v "^torch" requirements.txt > requirements_notorch.txt && \
+    pip install --no-cache-dir -r requirements_notorch.txt
+
 RUN pip install gdown
 
 COPY . .
