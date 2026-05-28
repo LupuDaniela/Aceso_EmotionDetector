@@ -126,7 +126,6 @@
 
 .legendLabel { font-size: 10.5px; color: rgba(255,255,255,0.58); }
 
-/* ── Light theme ────────────────────────────────────────── */
 .light .navBtn {
   background: rgba(139, 110, 197, 0.08);
   color: var(--accent, #8B6EC5);

@@ -49,7 +49,7 @@ def get_threads(user=Depends(verifica_token)):
     cursor.execute("""
         SELECT
             t.id, t.titlu, t.creat_la, t.actualizat_la,
-            (SELECT message FROM conversations WHERE thread_id = t.id ORDER BY timestamp DESC LIMIT 1),
+            (SELECT message FROM conversations WHERE thread_id = t.id ORDER BY timestamp ASC LIMIT 1),
             (SELECT emotie_dominanta FROM conversations WHERE thread_id = t.id ORDER BY timestamp DESC LIMIT 1),
             (SELECT diade_detectate FROM conversations WHERE thread_id = t.id ORDER BY timestamp DESC LIMIT 1)
         FROM chat_threads t

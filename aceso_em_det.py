@@ -33,8 +33,8 @@ from backend.core.hybrid_module  import analizeaza_text
 from backend.core.multi_aspect   import analizeaza_multi_aspect, afiseaza_rezultate as afiseaza_maed
 from backend.services.groq_integrare import genereaza_raspuns_empatic
 
-ALPHA       = 0.9   # calibrat prin ablation study pe REDv2 (MSE=0.0433)
-PRAG_DIADE  = 0.25   # prag optim selectat dupa testarea la 0.2 / 0.3 / 0.4 / 0.5
+ALPHA       = 0.9   
+PRAG_DIADE  = 0.25   
 
 BATCH_SIZE = 16
 EPOCHS     = 20
@@ -189,7 +189,6 @@ def afiseaza_statistici():
         """)
         distributie = cursor.fetchall()
 
-        # Extrage toate diadele din campul JSONB si numara frecventele.
         cursor.execute("""
             SELECT diada, COUNT(*) as count
             FROM conversations,

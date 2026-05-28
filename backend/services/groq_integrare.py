@@ -1,7 +1,3 @@
-"""
-groq_integrare.py — Raspuns empatic Groq + citate din tabelul citate_emotii
-"""
-
 import os
 import json
 import psycopg2
@@ -31,10 +27,6 @@ NORMALIZARE_EMOTIE = {
 
 
 def fetch_citat(emotie: str) -> str:
-    """
-    Returneaza un citat aleator pentru emotia data din tabelul citate_emotii.
-    Returneaza string gol daca nu exista citate sau conexiunea esueaza.
-    """
     emotie_db = NORMALIZARE_EMOTIE.get(emotie, emotie)
     try:
         conn = psycopg2.connect(**DB_CONFIG)
@@ -51,14 +43,28 @@ def fetch_citat(emotie: str) -> str:
         return ""
 
 
-def construieste_prompt(text: str, scoruri: dict) -> tuple[str, str, str]:
-    """
-    Construieste prompt-ul sistem si utilizator pentru Groq.
-    Identic cu construieste_prompt_cu_citat() din teste_llm_comparatie.py.
+def fetch_istoric(thread_id: int) -> list:
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT message, raspuns_empatic FROM conversations
+                WHERE thread_id = %s AND raspuns_empatic IS NOT NULL
+                ORDER BY timestamp DESC LIMIT 6
+            """, (thread_id,))
+            rows = cur.fetchall()
+        conn.close()
+        istoric = []
+        for mesaj, raspuns in reversed(rows):
+            istoric.append({"role": "user",      "content": mesaj})
+            istoric.append({"role": "assistant", "content": raspuns})
+        return istoric
+    except Exception as e:
+        print(f"[WARN] Nu am putut retrievi istoricul: {e}")
+        return []
 
-    Returns:
-        (sistem, utilizator, citat)  — citat poate fi string gol
-    """
+
+def construieste_prompt(text: str, scoruri: dict) -> tuple[str, str, str]:
     scoruri_filtrate = {
         e: round(s, 3)
         for e, s in sorted(scoruri.items(), key=lambda x: x[1], reverse=True)
@@ -73,25 +79,27 @@ def construieste_prompt(text: str, scoruri: dict) -> tuple[str, str, str]:
     ) if citat else ""
 
     sistem = (
-    "Ești un asistent empatic care ajută oamenii să-și proceseze emoțiile. "
-    "Răspunzi în limba română, cald și natural, în 2-4 propoziții. "
-    "Nu menționezi că ești AI, nu folosești termeni tehnici despre analiză emoțională, "
-    "nu dai sfaturi nesolicitate. Răspunsul trebuie să valideze emoția persoanei "
-    "și să o facă să se simtă înțeleasă. "
-    "Nu reproduce citate literare în răspuns — integrează doar esența lor dacă adaugă ceva valoros. "
-    "Dacă ți se cere părerea, ce ai face tu sau ce crezi, răspunde la persoana întâi "
-    "într-un mod cald și reflectiv, bazat pe ceea ce a împărtășit persoana. "
-    "Nu impune o concluzie clară — prezintă mai multe perspective posibile și "
-    "încurajează persoana să ajungă la propria decizie. "
-    "Pune o întrebare doar când simți că ar ajuta persoana să se exploreze mai profund, nu la fiecare mesaj."
-)
+        "Ești un asistent empatic care ajută oamenii să-și proceseze emoțiile. "
+        "Răspunzi în limba română, cald și natural, în 2-3 propoziții. "
+        "Nu menționezi că ești AI, nu folosești termeni tehnici despre analiză emoțională, "
+        "nu dai sfaturi nesolicitate. Răspunsul trebuie să valideze emoția persoanei "
+        "și să o facă să se simtă înțeleasă. "
+        "Nu reproduce citate literare în răspuns — integrează doar esența lor dacă adaugă ceva valoros. "
+        "Dacă ți se cere părerea, ce ai face tu sau ce crezi, răspunde la persoana întâi "
+        "într-un mod cald și reflectiv, bazat pe ceea ce a împărtășit persoana. "
+        "Nu impune o concluzie clară — prezintă mai multe perspective posibile și "
+        "încurajează persoana să ajungă la propria decizie. "
+        "Pune o întrebare doar când simți că ar ajuta persoana să se exploreze mai profund, nu la fiecare mesaj."
+    )
 
     utilizator = (
         f"Mesajul utilizatorului: \"{text}\"\n\n"
         f"Emoție dominantă detectată: {emotie_dominanta}\n"
         f"Scoruri emoționale: {json.dumps(scoruri_filtrate, ensure_ascii=False)}\n\n"
         f"{citat_sectiune}"
-        f"Răspunde empatic la mesajul utilizatorului."
+        f"Răspunde empatic la mesajul utilizatorului. Pune o întrebare doar dacă mesajul "
+        f"este ambiguu sau dacă persoana pare să caute activ o direcție. "
+        f"Dacă mesajul este clar și direct, validează emoția fără a pune întrebare."
     )
 
     return sistem, utilizator, citat
@@ -100,19 +108,9 @@ def construieste_prompt(text: str, scoruri: dict) -> tuple[str, str, str]:
 def genereaza_raspuns_empatic(
     text: str,
     scoruri: dict,
+    thread_id: int = None,
     afiseaza_citat: bool = False,
 ) -> str:
-    """
-    Punct de intrare principal — apelat din aceso_em_det.py.
-
-    Args:
-        text:           Textul original al utilizatorului.
-        scoruri:        Dict {emotie: scor} de la analizeaza_text().
-        afiseaza_citat: Daca True, printeaza citatul folosit.
-
-    Returns:
-        Raspunsul empatic generat de Groq.
-    """
     api_key = os.getenv("GROQ_API_KEY", "")
     if not api_key:
         return "[EROARE] GROQ_API_KEY nu este setat în .env"
@@ -125,16 +123,19 @@ def genereaza_raspuns_empatic(
         else:
             print(f"\n  [INFO] Niciun citat disponibil în DB pentru această emoție.")
 
+    istoric = fetch_istoric(thread_id) if thread_id else []
+
+    messages = [{"role": "system", "content": sistem}]
+    messages.extend(istoric)
+    messages.append({"role": "user", "content": utilizator})
+
     try:
         from groq import Groq
         client = Groq(api_key=api_key)
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": sistem},
-                {"role": "user",   "content": utilizator},
-            ],
-            max_tokens=350,
+            messages=messages,
+            max_tokens=500,
             temperature=0.7,
         )
         return response.choices[0].message.content.strip()

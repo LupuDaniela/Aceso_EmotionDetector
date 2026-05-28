@@ -4,9 +4,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import MoodCalendar        from '@/components/calendar/MoodCalendar'
 import Card, { CardTitle } from '@/components/card/Card'
-import { MONTHS_RO }       from '@/constants/calendar'
 import { ACHIEVEMENTS }    from '@/constants/achievements'
 import type { CalendarProps } from '@/types'
 import styles from './StatsView.module.css'
@@ -31,15 +29,14 @@ interface TimelinePoint {
 
 const PLUTCHIK: Record<string, string> = {
   Bucurie:    '#FDD835',
-  Tristete:   '#42A5F5',
+  Tristete:   '#02345d',
   Frica:      '#AB47BC',
   Furie:      '#EF5350',
   Surpriza:   '#FF7043',
   Incredere:  '#26A69A',
   Anticipare: '#FFA726',
   Dezgust:    '#66BB6A',
-  Neutru:     '#90A4AE',
-  Iubire:     '#F48FB1',
+  Neutru:     '#786842',
 }
 
 const DIADE_COLORS: Record<string, string> = {
@@ -56,7 +53,7 @@ const DIADE_COLORS: Record<string, string> = {
 const EMOTIE_EMOJI: Record<string, string> = {
   Bucurie: '😄', Tristete: '😢', Frica: '😨', Furie: '😡',
   Surpriza: '😲', Incredere: '🤝', Anticipare: '🌟',
-  Dezgust: '🤢', Neutru: '😐', Iubire: '🥰',
+  Dezgust: '🤢', Neutru: '😐'
 }
 
 const PLUTCHIK_ORDER = [
@@ -226,13 +223,6 @@ export default function StatsView({ streak, unlockedCount, calendar }: Props) {
           </p>
         </Card>
       )}
-
-      <Card>
-        <CardTitle>
-          📅 {MONTHS_RO[calendar.currentMonth]} {calendar.currentYear}
-        </CardTitle>
-        <MoodCalendar {...calendar} showLegend light />
-      </Card>
     </>
   )
 }

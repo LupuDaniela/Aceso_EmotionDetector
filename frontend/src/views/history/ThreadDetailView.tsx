@@ -20,14 +20,14 @@ interface Props {
 
 const PLUTCHIK: Record<string, string> = {
   Bucurie:    '#FDD835',
-  Tristete:   '#42A5F5',
+  Tristete:   '#02345d',
   Frica:      '#AB47BC',
   Furie:      '#EF5350',
   Surpriza:   '#FF7043',
   Incredere:  '#26A69A',
   Anticipare: '#FFA726',
   Dezgust:    '#66BB6A',
-  Neutru:     '#90A4AE',
+  Neutru:     '#786842',
 }
 
 const EMOTIE_EMOJI: Record<string, string> = {
@@ -38,6 +38,19 @@ const EMOTIE_EMOJI: Record<string, string> = {
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })
+}
+
+function needsStroke(hex: string): boolean {
+  const lightColors = ['#02345d', '#26A69A', '#786842']
+  return lightColors.includes(hex)
+}
+
+function textColor(hex: string): string {
+  const r = parseInt(hex.slice(1,3), 16)
+  const g = parseInt(hex.slice(3,5), 16)
+  const b = parseInt(hex.slice(5,7), 16)
+  const luminance = (0.299*r + 0.587*g + 0.114*b) / 255
+  return luminance > 0.55 ? '#2D2640' : '#fff'
 }
 
 export default function ThreadDetailView({ threadId, theme, onBack }: Props) {
@@ -82,7 +95,7 @@ export default function ThreadDetailView({ threadId, theme, onBack }: Props) {
                 </div>
                 <span
                   className={styles.emotionBadge}
-                  style={{ background: color + '22', color, borderColor: color + '55' }}
+                  style={{ background: color + '16' , color: textColor(color), borderColor: color + '55' }}
                 >
                   {emoji} {msg.emotie_dominanta}
                   <span className={styles.score}>{Math.round(msg.scor_dominant * 100)}%</span>

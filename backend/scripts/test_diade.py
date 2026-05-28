@@ -11,10 +11,10 @@ import json
 from pathlib import Path
 from collections import Counter
 
-from model_logic    import incarca_model
-from lexical_module import RoEmoLexModule
-from hybrid_module  import analizeaza_text
-from multi_aspect   import analizeaza_multi_aspect
+from backend.core.model_logic    import incarca_model
+from backend.core.lexical_module import RoEmoLexModule
+from backend.core.hybrid_module  import analizeaza_text
+from backend.core.multi_aspect   import analizeaza_multi_aspect
 
 BASE_DIR  = Path(__file__).parent
 TEST_PATH = BASE_DIR / 'data_REDv2' / 'test.json'
@@ -153,7 +153,6 @@ if __name__ == '__main__':
     model, tokenizer = incarca_model()
     modul_lexical    = RoEmoLexModule()
  
-    # ── 1. REDv2 ──────────────────────────────────────────────────
     print("\nIncarc setul de test REDv2...")
     with open(TEST_PATH, 'r', encoding='utf-8') as f:
         date_redv2 = json.load(f)
@@ -169,7 +168,6 @@ if __name__ == '__main__':
         )
         scoruri_redv2.append(normalizeaza_sf(sf))
  
-    # ── 2. Multi-Aspect ───────────────────────────────────────────
     print(f"\nIncarc setul multi-aspect ({MA_TEST_PATH.name})...")
     with open(MA_TEST_PATH, 'r', encoding='utf-8') as f:
         date_ma = json.load(f)
@@ -184,7 +182,6 @@ if __name__ == '__main__':
         )
         scoruri_ma.append(normalizeaza_sf(rezultat['agregat']))
  
-    # ── 3. Calcul diade pentru toate pragurile ─────────────────────
     print("\nAplic conditia dubla pentru praguri diferite...")
     rezultate_redv2 = {}
     rezultate_ma    = {}
@@ -200,10 +197,8 @@ if __name__ == '__main__':
         afiseaza_tabel(contor_ma,  scoruri_medii_ma,  total_ma,    prag,
                        "REZULTATE MULTI-ASPECT")
  
-    # ── 4. Tabel comparativ ────────────────────────────────────────
     afiseaza_comparatie(rezultate_redv2, rezultate_ma, total_redv2, total_ma)
  
-    # ── 5. Salvare JSON ───────────────────────────────────────────
     print("\nSalveaza rezultate...")
     export = {}
     for prag in [0.2, 0.3, 0.4, 0.5]:

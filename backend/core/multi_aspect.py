@@ -48,15 +48,7 @@ from .lexical_module import RoEmoLexModule
 
 PRAG_AFISARE = 0.05
 
-# Etichete Universal Dependencies care marcheaza granite de clauza.
-# Toate sunt etichete UD standard, valabile pentru orice limba suportata de spaCy — nu sunt reguli specifice limbii romane.
-
-# conj     : propozitie coordonata  ("Sunt trist, dar sunt mandru")
-# advcl    : clauza adverbiala      ("Sunt fericit desi am obosit")
-# parataxis: clauza loose/juxtapusa ("Am castigat, am pierdut")
-# ccomp (complement clausal) este exclus intentionat: "Stiu ca esti trist"
-
-TIPURI_CLAUZE = {'conj', 'parataxis'} # advcl
+TIPURI_CLAUZE = {'conj', 'parataxis'} 
 
 
 def _curata_text_clauza(tokeni: list) -> tuple:
@@ -80,9 +72,6 @@ def _curata_text_clauza(tokeni: list) -> tuple:
     while tokeni and (tokeni[0].is_punct or tokeni[0].dep_ == 'cc'):
         tokeni = tokeni[1:]
  
-    # Elimina de la SFARSIT: punctuatie, dep='cc' si POS='CCONJ'.
-    # spaCy eticheteaza uneori 'si'/'dar' ca CCONJ fara dep_='cc',
-    # deci verificam ambele etichete pentru acoperire completa.
     while tokeni and (tokeni[-1].is_punct
                       or tokeni[-1].dep_ == 'cc'
                       or tokeni[-1].pos_ == 'CCONJ'):
@@ -284,8 +273,7 @@ def analizeaza_multi_aspect(text: str, model, tokenizer,
             'nr_tokeni': nr_tok,
         })
 
-    # Agregare ponderata dupa numarul de tokeni valizi per clauza.
-    # O clauza mai lunga contribuie proportional mai mult la scorul final
+
     total_tokeni = sum(s['nr_tokeni'] for s in segmente)
     emotii       = list(segmente[0]['scoruri'].keys())
 

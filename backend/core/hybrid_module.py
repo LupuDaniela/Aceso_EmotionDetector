@@ -9,12 +9,10 @@ from .preprocess    import detecteaza_leme_negate, elimina_diacritice
 BASE_DIR   = Path(__file__).parent
 VALID_PATH = BASE_DIR / 'data_REDv2' / 'valid.json'
 
-# Modelul are 7 emotii, RoEmoLex are 8 — Anticipare si Dezgust lipsesc din model
 EMOTII_COMUNE  = ['Tristețe', 'Surpriză', 'Frică', 'Furie', 'Încredere', 'Bucurie']
-DOAR_LEXICAL   = ['Anticipare', 'Dezgust']   # absente din REDv2
-DOAR_MODEL     = ['Neutru']                   # absent din RoEmoLex
+DOAR_LEXICAL   = ['Anticipare', 'Dezgust']   
+DOAR_MODEL     = ['Neutru']                   
 
-# mapare nume emotii model → nume emotii RoEmoLex (identice, dar verificam)
 MAPARE_COMUNE = {e: e for e in EMOTII_COMUNE}
 
 FACTOR_NEGATIE_HIBRID = 0.2
@@ -41,17 +39,14 @@ def combina_scoruri(scor_model: dict, scor_lexical: dict, alpha: float) -> dict:
     """
     scor_final = {}
 
-    # emotii comune — formula completa
     for emotie in EMOTII_COMUNE:
         sm = scor_model.get(emotie, 0.0)
         sl = scor_lexical.get(emotie, 0.0)
         scor_final[emotie] = alpha * sm + (1 - alpha) * sl
 
-    # emotii doar din lexicon
     for emotie in DOAR_LEXICAL:
         scor_final[emotie] = scor_lexical.get(emotie, 0.0)
 
-    # emotii doar din model
     for emotie in DOAR_MODEL:
         scor_final[emotie] = scor_model.get(emotie, 0.0)
 
@@ -118,7 +113,6 @@ def calculeaza_mse_validare(model, tokenizer, modul_lexical: RoEmoLexModule,
         sl, _ = modul_lexical.analizeaza(text)
         sf    = combina_scoruri(sm, sl, alpha)
 
-        # MSE doar pe emotiile din REDv2 (cele 7)
         for i, emotie in enumerate(EMOTII):
             pred  = sf.get(emotie, 0.0)
             label = labels[i]

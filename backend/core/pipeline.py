@@ -81,7 +81,9 @@ class AcesoPipeline:
         if genereaza_empatic:
             try:
                 from services.groq_integrare import genereaza_raspuns_empatic
-                raspuns_empatic = genereaza_raspuns_empatic(text, scoruri)
+                raspuns_empatic = genereaza_raspuns_empatic(
+                    text, scoruri, thread_id=thread_id
+                )
             except Exception as e:
                 print(f"[WARN] Eroare generare raspuns empatic: {e}")
                 raspuns_empatic = "Îți mulțumesc că ai împărtășit asta cu mine."
@@ -118,7 +120,6 @@ class AcesoPipeline:
     def get_statistici(self, user_id: int = None) -> dict:
         try:
             conn = get_conn(); cursor = conn.cursor()
-
             if user_id:
                 cursor.execute("SELECT COUNT(*) FROM conversations WHERE user_id = %s", (user_id,))
             else:

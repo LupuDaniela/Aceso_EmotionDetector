@@ -34,7 +34,7 @@ function EyeIcon({ open }: { open: boolean }) {
 
 export default function LoginPage() {
   const navigate       = useNavigate()
-  const { setToken }   = useAuth()           // ← adaugat
+  const { setToken }   = useAuth()           
 
   const [view,     setView]     = useState<View>('login')
   const [email,    setEmail]    = useState('')
@@ -54,7 +54,7 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search)
     const token  = params.get('token')
     if (token) {
-      setToken(token)                        // ← era localStorage.setItem
+      setToken(token)                        
       window.history.replaceState({}, '', '/auth/callback')
       navigate('/dashboard', { replace: true })
     }
@@ -70,7 +70,7 @@ export default function LoginPage() {
     setError(''); setLoading(true)
     try {
       const data = await authService.login({ email, password })
-      setToken(data.access_token)            // ← era localStorage.setItem
+      setToken(data.access_token)            
       navigate('/dashboard', { replace: true })
     } catch (err) {
       setError((err as Error).message)

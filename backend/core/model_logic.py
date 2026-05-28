@@ -6,7 +6,7 @@ from pathlib import Path
 from .preprocess import preproceseaza_model
 
 MODEL_NAME = "xlm-roberta-base"
-MAX_LENGTH = 128 # textele mai lungi de 128 tokeni sunt trunchiate
+MAX_LENGTH = 128 
 DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 EMOTII = ['Tristețe', 'Surpriză', 'Frică', 'Furie',
@@ -33,8 +33,8 @@ class EmotionRegressor(nn.Module):
         """
         super().__init__()
         self.encoder   = AutoModel.from_pretrained(MODEL_NAME, local_files_only=True)
-        self.dropout   = nn.Dropout(0.1) #la antrenare, 10% din neuronii stratului sunt dezactivati aleatoriu la fiecare pas, acest lucru previne overfitting-ul
-        self.regressor = nn.Linear(768, len(EMOTII)) #strat liniar -> comprima reprezentarea de 768 dimensiuni in 7 scoruri, unul per emoție
+        self.dropout   = nn.Dropout(0.1) 
+        self.regressor = nn.Linear(768, len(EMOTII)) 
         self.sigmoid   = nn.Sigmoid()
 
     def forward(self, input_ids, attention_mask):

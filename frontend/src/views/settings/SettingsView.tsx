@@ -58,7 +58,6 @@ export default function SettingsView({ themeId, onThemeChange }: Props) {
   return (
     <div>
 
-      {/* Profil */}
       <div className={styles.themeSection}>
         <h3 className={styles.sectionTitle}>👤 Profil</h3>
         <p className={styles.sectionHint}>
@@ -121,7 +120,6 @@ export default function SettingsView({ themeId, onThemeChange }: Props) {
         )}
       </div>
 
-      {/* Tema */}
       <div className={styles.themeSection}>
         <h3 className={styles.sectionTitle}>🎨 Temă vizuală</h3>
         <p className={styles.sectionHint}>

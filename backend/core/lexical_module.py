@@ -180,17 +180,17 @@ if __name__ == '__main__':
         "Mi-e frică și nu știu ce să fac.",
         "Sunt furioasă pe ce s-a întâmplat azi.",
         "Îmi amintesc cu drag de copilărie, dar nu mai pot reveni.",
-        "Abia aștept să mă duc la film",        # verb prezent
-        "Sper să reușesc la examen",            # verb prezent  
-        "Plănuiesc o vacanță în vară",          # verb prezent
-        "O să merg mâine la munte",             # viitor cu o să
-        "Voi merge săptămâna viitoare",         # viitor simplu
-        "Am nerăbdare să îl văd",               # substantiv
-        "Mi-e scârbă de ce a făcut",            # expresie directă
-        "E dezgustător comportamentul lui",     # adjectiv
-        "Nu suport minciuna",                   # verb indirect
-        "Îmi repugnă situația asta",            # verb direct
-        "Ce greață îmi face"                   # substantiv
+        "Abia aștept să mă duc la film",        
+        "Sper să reușesc la examen",            
+        "Plănuiesc o vacanță în vară",          
+        "O să merg mâine la munte",             
+        "Voi merge săptămâna viitoare",         
+        "Am nerăbdare să îl văd",               
+        "Mi-e scârbă de ce a făcut",            
+        "E dezgustător comportamentul lui",     
+        "Nu suport minciuna",                   
+        "Îmi repugnă situația asta",            
+        "Ce greață îmi face"                  
 
     ]
     for text in teste:

@@ -38,7 +38,6 @@ const EMOTIE_TO_MOOD: Record<string, MoodKey> = {
   Anticipare: 'anticipation',
   Dezgust:    'disgust',
   Neutru:     'neutral',
-  Iubire:     'love',
 }
 
 function getInitials(name: string): string {

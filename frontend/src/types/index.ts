@@ -10,7 +10,7 @@ export type NavView =
 export type MoodKey =
   | 'joy' | 'sadness' | 'fear' | 'anger'
   | 'surprise' | 'trust' | 'anticipation'
-  | 'disgust' | 'love' | 'neutral'
+  | 'disgust' | 'neutral'
 
 export interface MoodConfig {
   emoji: string

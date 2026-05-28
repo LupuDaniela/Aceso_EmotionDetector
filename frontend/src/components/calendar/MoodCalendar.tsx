@@ -86,7 +86,7 @@ export default function MoodCalendar({
           const isToday = isTodayDay(currentYear, currentMonth, day)
           const dateKey = toDateKey(new Date(currentYear, currentMonth, day))
           const mood    = moodLog[dateKey] as MoodKey | undefined
-          const cfg     = mood ? MOOD_CONFIG[mood] : undefined
+          const cfg = mood ? MOOD_CONFIG[mood] ?? MOOD_CONFIG['neutral'] : undefined
 
           return (
             <div

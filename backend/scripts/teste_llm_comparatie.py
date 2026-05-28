@@ -7,7 +7,7 @@ import torch
 from pathlib import Path
 from dotenv import load_dotenv
 
-sys.path.append(str(Path(__file__).parent.parent.parent))  # radacina proiectului
+sys.path.append(str(Path(__file__).parent.parent.parent))  
 load_dotenv()
 
 from backend.core.model_logic    import incarca_model, EmotionRegressor, MODEL_PATH, DEVICE
@@ -48,9 +48,6 @@ PROPOZITII_TEST = [
 ]
 
 
-# ─────────────────────────────────────────────
-# Embedding CLS cu XLM-RoBERTa
-# ─────────────────────────────────────────────
 def get_cls_embedding(text: str, model, tokenizer) -> torch.Tensor:
     """
     Calculeaza embedding-ul CLS al unui text folosind encoder-ul XLM-RoBERTa
@@ -68,13 +65,10 @@ def get_cls_embedding(text: str, model, tokenizer) -> torch.Tensor:
             input_ids=encoding['input_ids'].to(DEVICE),
             attention_mask=encoding['attention_mask'].to(DEVICE)
         )
-    emb = output.last_hidden_state[:, 0, :]          # token CLS, shape [1, 768]
-    return emb / emb.norm(dim=-1, keepdim=True)       # normalizare L2
+    emb = output.last_hidden_state[:, 0, :]          
+    return emb / emb.norm(dim=-1, keepdim=True)       
 
 
-# ─────────────────────────────────────────────
-# Selectie citat prin similaritate semantica
-# ─────────────────────────────────────────────
 def fetch_citat_similar(emotie: str, text_utilizator: str,
                         model, tokenizer) -> str:
     """
@@ -107,11 +101,9 @@ def fetch_citat_similar(emotie: str, text_utilizator: str,
     if not rows:
         return ""
 
-    # Un singur citat → returnare directa fara calcul de similaritate
     if len(rows) == 1:
         return f'„{rows[0][1]}" — {rows[0][0]}'
 
-    # Calculeaza embeddings si alege citatul cu similaritate maxima
     emb_mesaj = get_cls_embedding(text_utilizator, model, tokenizer)
 
     best_idx = 0
@@ -128,9 +120,7 @@ def fetch_citat_similar(emotie: str, text_utilizator: str,
     return f'„{citat}" — {autor}'
 
 
-# ─────────────────────────────────────────────
-# Constructie prompt — Varianta A (fara citat)
-# ─────────────────────────────────────────────
+
 def construieste_prompt_fara_citat(text: str, scoruri: dict) -> tuple:
     """
     Varianta A: prompt standard, fara citate.
@@ -161,9 +151,7 @@ def construieste_prompt_fara_citat(text: str, scoruri: dict) -> tuple:
     return sistem, utilizator
 
 
-# ─────────────────────────────────────────────
-# Constructie prompt — Varianta B (cu citat)
-# ─────────────────────────────────────────────
+
 def construieste_prompt_cu_citat(text: str, scoruri: dict,
                                  model, tokenizer) -> tuple:
     """
@@ -204,9 +192,7 @@ def construieste_prompt_cu_citat(text: str, scoruri: dict,
     return sistem, utilizator, citat
 
 
-# ─────────────────────────────────────────────
-# Apeluri API
-# ─────────────────────────────────────────────
+
 def raspuns_groq(sistem: str, utilizator: str, api_key: str) -> str:
     try:
         from groq import Groq
@@ -242,9 +228,7 @@ def raspuns_mistral(sistem: str, utilizator: str, api_key: str) -> str:
         return f"[EROARE Mistral] {e}"
 
 
-# ─────────────────────────────────────────────
-# Main
-# ─────────────────────────────────────────────
+
 def main():
     groq_key    = os.getenv("GROQ_API_KEY",    "")
     mistral_key = os.getenv("MISTRAL_API_KEY", "")
@@ -288,8 +272,8 @@ def main():
         else:
             print(f"  [INFO] Niciun citat disponibil pentru emotia '{emotie_dom}'.\n")
 
-        raspunsuri_a = {}   # fara citat
-        raspunsuri_b = {}   # cu citat
+        raspunsuri_a = {}   
+        raspunsuri_b = {}   
 
         if groq_key:
             print("  [Groq + Llama3] Varianta A (fara citat)...")
