@@ -13,6 +13,8 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 RUN grep -v "^torch" requirements.txt > requirements_notorch.txt && \
     pip install --no-cache-dir -r requirements_notorch.txt
 
+RUN python -m spacy download ro_core_news_lg
+
 RUN pip install gdown
 
 COPY . .
