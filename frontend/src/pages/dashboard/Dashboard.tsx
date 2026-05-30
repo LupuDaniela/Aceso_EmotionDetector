@@ -104,7 +104,12 @@ export default function Dashboard() {
             <AchievementsView unlockedAchs={unlockedAchs} streak={streak} />
           )}
           {activeView === 'settings' && (
-            <SettingsView themeId={theme.id} onThemeChange={setTheme} />
+            <SettingsView
+              themeId={theme.id}
+              onThemeChange={setTheme}
+              keepAchievements={dash.keepAchievements}
+              onKeepAchievements={dash.setKeepAchievements}
+            />
           )}
         </div>
 

@@ -14,17 +14,21 @@ export interface DashboardState {
   currentCharacter:    AchievementConfig | null
   nextAchievement:     AchievementConfig | null
   progressToNext:      number
+  keepAchievements:    boolean
   setTheme:            (id: ThemeId) => void
   setActiveView:       (view: NavView) => void
   setSelectedCharacter:(ach: AchievementConfig) => void
+  setKeepAchievements: (val: boolean) => void
   calendar:            UseCalendarReturn
 }
 
 export function useDashboard(userId?: string | number): DashboardState {
-  const storageKey = userId ? `aceso_moods_${userId}` : 'aceso_mood_log'
-  const charKey    = userId ? `aceso_character_${userId}` : 'aceso_character'
-  const themeKey   = userId ? `aceso_theme_${userId}` : 'aceso_theme'
-  const calendar   = useCalendar(storageKey)
+  const storageKey   = userId ? `aceso_moods_${userId}` : 'aceso_mood_log'
+  const charKey      = userId ? `aceso_character_${userId}` : 'aceso_character'
+  const themeKey     = userId ? `aceso_theme_${userId}` : 'aceso_theme'
+  const keepAchKey   = userId ? `aceso_keep_ach_${userId}` : 'aceso_keep_ach'
+  const maxStreakKey  = userId ? `aceso_max_streak_${userId}` : 'aceso_max_streak'
+  const calendar     = useCalendar(storageKey)
 
   const [themeId, setThemeId] = useState<ThemeId>(() => {
     const saved = localStorage.getItem(themeKey)
@@ -38,12 +42,24 @@ export function useDashboard(userId?: string | number): DashboardState {
     return saved ? Number(saved) : null
   })
 
+  const [keepAchievements, setKeepAchievementsState] = useState<boolean>(() => {
+    const saved = localStorage.getItem(keepAchKey)
+    return saved === null ? true : saved === 'true'
+  })
+
   const theme  = THEMES[themeId]
   const streak = calendar.streak
 
+  const maxStreak = useMemo(() => {
+    const saved = parseInt(localStorage.getItem(maxStreakKey) ?? '0', 10)
+    const current = Math.max(saved, streak)
+    if (current > saved) localStorage.setItem(maxStreakKey, String(current))
+    return current
+  }, [streak, maxStreakKey])
+
   const unlockedAchs = useMemo(
-    () => ACHIEVEMENTS.filter(a => streak >= a.days),
-    [streak]
+    () => ACHIEVEMENTS.filter(a => (keepAchievements ? maxStreak : streak) >= a.days),
+    [streak, maxStreak, keepAchievements]
   )
 
   const currentCharacter = useMemo(() => {
@@ -76,9 +92,16 @@ export function useDashboard(userId?: string | number): DashboardState {
     localStorage.setItem(charKey, String(ach.days))
   }, [charKey])
 
+  const setKeepAchievements = useCallback((val: boolean) => {
+    setKeepAchievementsState(val)
+    localStorage.setItem(keepAchKey, String(val))
+  }, [keepAchKey])
+
   return {
     theme, activeView, streak,
     unlockedAchs, currentCharacter, nextAchievement, progressToNext,
-    setTheme, setActiveView, setSelectedCharacter, calendar,
+    keepAchievements,
+    setTheme, setActiveView, setSelectedCharacter, setKeepAchievements,
+    calendar,
   }
 }

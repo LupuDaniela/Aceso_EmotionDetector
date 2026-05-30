@@ -5,11 +5,13 @@ import styles from './SettingsView.module.css'
 import { API_URL } from '../../utils/api'
 
 interface Props {
-  themeId:       ThemeId
-  onThemeChange: (id: ThemeId) => void
+  themeId:             ThemeId
+  onThemeChange:       (id: ThemeId) => void
+  keepAchievements:    boolean
+  onKeepAchievements:  (val: boolean) => void
 }
 
-export default function SettingsView({ themeId, onThemeChange }: Props) {
+export default function SettingsView({ themeId, onThemeChange, keepAchievements, onKeepAchievements }: Props) {
   const navigate = useNavigate()
   const [name,      setName]      = useState('')
   const [email,     setEmail]     = useState('')
@@ -119,6 +121,28 @@ export default function SettingsView({ themeId, onThemeChange }: Props) {
             </div>
           </form>
         )}
+      </div>
+
+      <div className={styles.themeSection}>
+        <h3 className={styles.sectionTitle}>🏆 Realizări</h3>
+        <p className={styles.sectionHint}>
+          Alege dacă realizările deblocate se păstrează chiar dacă pierzi streak-ul.
+        </p>
+        <div className={styles.toggleRow}>
+          <span className={styles.toggleLabel}>
+            {keepAchievements
+              ? 'Realizările se păstrează permanent'
+              : 'Realizările se pierd odată cu streak-ul'}
+          </span>
+          <button
+            type="button"
+            className={[styles.toggle, keepAchievements ? styles.toggleOn : ''].filter(Boolean).join(' ')}
+            onClick={() => onKeepAchievements(!keepAchievements)}
+            aria-label="Toggle păstrare realizări"
+          >
+            <span className={styles.toggleThumb} />
+          </button>
+        </div>
       </div>
 
       <div className={styles.themeSection}>
