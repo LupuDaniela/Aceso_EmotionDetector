@@ -30,15 +30,19 @@ interface Props {
 }
 
 const EMOTIE_TO_MOOD: Record<string, MoodKey> = {
-  Bucurie:    'joy',
-  Tristete:   'sadness',
-  Frica:      'fear',
-  Furie:      'anger',
-  Surpriza:   'surprise',
-  Incredere:  'trust',
-  Anticipare: 'anticipation',
-  Dezgust:    'disgust',
-  Neutru:     'neutral',
+  Bucurie:     'joy',
+  Tristete:    'sadness',
+  'Tristețe':  'sadness',
+  Frica:       'fear',
+  'Frică':     'fear',
+  Furie:       'anger',
+  Surpriza:    'surprise',
+  'Surpriză':  'surprise',
+  Incredere:   'trust',
+  'Încredere': 'trust',
+  Anticipare:  'anticipation',
+  Dezgust:     'disgust',
+  Neutru:      'neutral',
 }
 
 function getInitials(name: string): string {
@@ -108,6 +112,7 @@ export default function ConversationView({
 
       if (!loggedToday.current) {
         const mood = EMOTIE_TO_MOOD[data.emotie_dominanta]
+        console.log('emotie_dominanta:', data.emotie_dominanta, '→ mood:', mood)
         if (mood) {
           const today = new Date()
           today.setHours(0, 0, 0, 0)
