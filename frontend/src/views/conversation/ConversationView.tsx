@@ -49,7 +49,7 @@ function getInitials(name: string): string {
 
 async function createThread(token: string): Promise<number | null> {
   try {
-    const res = await fetch('${API_URL}/api/chat/thread', {
+    const res = await fetch(`${API_URL}/api/chat/thread`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body:    JSON.stringify({ titlu: null }),
