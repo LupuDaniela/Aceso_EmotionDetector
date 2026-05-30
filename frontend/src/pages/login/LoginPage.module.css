@@ -216,7 +216,41 @@
 }
 
 @media (max-width: 720px) {
+  .bg {
+    padding: 1rem 0;
+    align-items: flex-start;
+  }
+
+  .card {
+    width: 100%;
+    min-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .right { display: none; }
-  .left  { flex: 1; padding: 2.5rem 1.75rem; }
-  .card  { min-height: unset; }
+
+  .left {
+    flex: 1;
+    width: 100%;
+    padding: 2rem 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .logo img { height: 70px; }
+
+  .input {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .btnPrimary {
+    padding: 0.9rem;
+    font-size: 1rem;
+  }
+
+  .btnGoogle {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
 }

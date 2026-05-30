@@ -23,6 +23,13 @@ export default function Dashboard() {
   } = dash
 
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
 
   useEffect(() => {
     if (!theme) return
@@ -122,7 +129,7 @@ export default function Dashboard() {
           />
         )}
 
-        {activeView === 'history' && (
+        {activeView === 'history' && !isMobile && (
           <div className={styles.rightPanel}>
             <div className={selectedThreadId !== null ? styles.sceneBlurred : styles.sceneNormal}>
               <ScenePanel
@@ -141,6 +148,16 @@ export default function Dashboard() {
                 />
               </div>
             )}
+          </div>
+        )}
+
+        {isMobile && selectedThreadId !== null && (
+          <div className={styles.mobileThreadOverlay}>
+            <ThreadDetailView
+              threadId={selectedThreadId}
+              theme={theme}
+              onBack={() => setSelectedThreadId(null)}
+            />
           </div>
         )}
       </main>
