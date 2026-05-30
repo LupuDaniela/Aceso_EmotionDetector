@@ -41,7 +41,7 @@ export default function SettingsView({ themeId, onThemeChange }: Props) {
     setSaving(true); setError(''); setSuccess('')
     try {
       const token = localStorage.getItem('aceso_token') ?? ''
-      const res = await fetch('${API_URL}/auth/me', {
+      const res = await fetch(`${API_URL}/auth/me`, {
         method:  'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body:    JSON.stringify({ name, email }),

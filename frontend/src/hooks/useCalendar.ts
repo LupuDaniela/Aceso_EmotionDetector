@@ -75,7 +75,7 @@ export function useCalendar(userId: string | number | null | undefined): UseCale
     setMoodLog(prev => ({ ...prev, [dateKey]: mood }))
     const token = localStorage.getItem('aceso_token')
     if (!token) return
-    fetch('${API_URL}/api/moods', {
+    fetch(`${API_URL}/api/moods`, {
       method:  'POST',
       headers: {
         'Content-Type':  'application/json',
