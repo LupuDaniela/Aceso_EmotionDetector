@@ -156,7 +156,7 @@ export default function StatsView({ streak, unlockedCount, calendar }: Props) {
                 <YAxis tick={{ fontSize: 10, fill: '#A098BC' }} allowDecimals={false} />
                 <Tooltip
                   formatter={(val) => [`${val ?? 0} conversații`, 'Total']}
-                  labelFormatter={(label: string) => formatDateShort(label)}
+                  labelFormatter={(label: any) => formatDateShort(label as string)}
                   contentStyle={{
                     background: '#fff',
                     border: '1px solid rgba(139,110,197,0.2)',
