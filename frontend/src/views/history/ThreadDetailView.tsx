@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { AcesoTheme } from '../../constants/themes'
 import logoA from '@/assets/logo_aceso_a.png'
 import styles from './ThreadDetailView.module.css'
+import { API_URL } from '../../utils/api'
 
 interface ThreadMessage {
   id:               number
@@ -62,7 +63,7 @@ export default function ThreadDetailView({ threadId, theme, onBack }: Props) {
     setMessages([])
     const token = localStorage.getItem('aceso_token')
     if (!token) { setLoading(false); return }
-    fetch(`/api/chat/thread/${threadId}/messages`, {
+    fetch(`${API_URL}/api/chat/thread/${threadId}/messages`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(r => r.ok ? r.json() : [])

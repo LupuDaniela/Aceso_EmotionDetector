@@ -8,6 +8,7 @@ import Card, { CardTitle } from '@/components/card/Card'
 import { ACHIEVEMENTS }    from '@/constants/achievements'
 import type { CalendarProps } from '@/types'
 import styles from './StatsView.module.css'
+import { API_URL } from '../../utils/api'
 
 interface Props {
   streak:        number
@@ -73,8 +74,8 @@ export default function StatsView({ streak, unlockedCount, calendar }: Props) {
   useEffect(() => {
     const token = localStorage.getItem('aceso_token')
     const h = { 'Authorization': `Bearer ${token}` }
-    fetch('/api/stats',          { headers: h }).then(r => r.json()).then(setApiStats).catch(() => {})
-    fetch('/api/stats/timeline', { headers: h }).then(r => r.json()).then(setTimeline).catch(() => {})
+    fetch(`${API_URL}/api/stats`,          { headers: h }).then(r => r.json()).then(setApiStats).catch(() => {})
+    fetch(`${API_URL}/api/stats/timeline`, { headers: h }).then(r => r.json()).then(setTimeline).catch(() => {})
   }, [])
 
   const generalStats = [

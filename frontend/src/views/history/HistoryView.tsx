@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { AcesoTheme } from '../../constants/themes'
 import styles from './HistoryView.module.css'
+import { API_URL } from '../../utils/api'
 
 interface ThreadItem {
   id:            number
@@ -48,7 +49,7 @@ export default function HistoryView({ theme, onSelectThread }: Props) {
   useEffect(() => {
     const token = localStorage.getItem('aceso_token')
     if (!token) { setLoading(false); return }
-    fetch('/api/chat/threads', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_URL}/api/chat/threads`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : [])
       .then(data => { setItems(Array.isArray(data) ? data : []); setLoading(false) })
       .catch(() => setLoading(false))

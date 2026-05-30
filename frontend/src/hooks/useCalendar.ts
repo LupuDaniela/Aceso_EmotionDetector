@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { toDateKey } from '@/utils/date'
 import type { MoodKey, CalendarProps } from '@/types'
+import { API_URL } from '../utils/api'
 
 type MoodLog = Record<string, MoodKey>
 
@@ -52,7 +53,7 @@ export function useCalendar(userId: string | number | null | undefined): UseCale
 
     setMoodLog({})
 
-    fetch('/api/moods', {
+    fetch(`${API_URL}/api/moods`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then(r => r.ok ? r.json() : {})
@@ -74,7 +75,7 @@ export function useCalendar(userId: string | number | null | undefined): UseCale
     setMoodLog(prev => ({ ...prev, [dateKey]: mood }))
     const token = localStorage.getItem('aceso_token')
     if (!token) return
-    fetch('/api/moods', {
+    fetch('${API_URL}/api/moods', {
       method:  'POST',
       headers: {
         'Content-Type':  'application/json',
@@ -92,7 +93,7 @@ export function useCalendar(userId: string | number | null | undefined): UseCale
     })
     const token = localStorage.getItem('aceso_token')
     if (!token) return
-    fetch(`/api/moods/${dateKey}`, {
+    fetch(`${API_URL}/api/moods/${dateKey}`, {
       method:  'DELETE',
       headers: { 'Authorization': `Bearer ${token}` },
     }).catch(() => {})

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { THEMES, type ThemeId } from '@/constants/themes'
 import styles from './SettingsView.module.css'
+import { API_URL } from '../../utils/api'
 
 interface Props {
   themeId:       ThemeId
@@ -21,7 +22,7 @@ export default function SettingsView({ themeId, onThemeChange }: Props) {
   useEffect(() => {
     const token = localStorage.getItem('aceso_token') ?? ''
     setLoading(true)
-    fetch('/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => {
         setName(data.name ?? '')
@@ -40,7 +41,7 @@ export default function SettingsView({ themeId, onThemeChange }: Props) {
     setSaving(true); setError(''); setSuccess('')
     try {
       const token = localStorage.getItem('aceso_token') ?? ''
-      const res = await fetch('/auth/me', {
+      const res = await fetch('${API_URL}/auth/me', {
         method:  'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body:    JSON.stringify({ name, email }),

@@ -4,6 +4,7 @@ import type { AcesoTheme } from '../../constants/themes'
 import type { MoodKey, AchievementConfig } from '@/types'
 import logoA from '@/assets/logo_aceso_a.png'
 import styles from './ConversationView.module.css'
+import { API_URL } from '../../utils/api'
 
 interface AnalyzeResult {
   emotie_dominanta: string
@@ -48,7 +49,7 @@ function getInitials(name: string): string {
 
 async function createThread(token: string): Promise<number | null> {
   try {
-    const res = await fetch('/api/chat/thread', {
+    const res = await fetch('${API_URL}/api/chat/thread', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body:    JSON.stringify({ titlu: null }),
@@ -96,7 +97,7 @@ export default function ConversationView({
         if (tid !== null) setThreadId(tid)
       }
 
-      const res = await fetch('/api/chat/message', {
+      const res = await fetch(`${API_URL}/api/chat/message`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body:    JSON.stringify({ text, thread_id: tid }),

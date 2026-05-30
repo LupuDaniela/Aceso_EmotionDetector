@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import styles from '../login/LoginPage.module.css'
 import logoAceso from '../../assets/logo_aceso.png'
 import authImage  from '../../assets/photo_auth.png'
+import { API_URL } from '../../utils/api'
 
 function EyeIcon({ open }: { open: boolean }) {
   return open ? (
@@ -39,7 +40,7 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     if (!token) return
-    fetch(`/auth/user-from-token?token=${token}`)
+    fetch(`${API_URL}/auth/user-from-token?token=${token}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data) setUserInfo({ name: data.name, email: data.email }) })
       .catch(() => {})
@@ -51,7 +52,7 @@ export default function ResetPasswordPage() {
     if (password.length < 6)  { setError('Parola trebuie să aibă cel puțin 6 caractere.'); return }
     setLoading(true); setError('')
     try {
-      const res = await fetch('/auth/reset-password', {
+      const res = await fetch('${API_URL}/auth/reset-password', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ token, new_password: password }),
