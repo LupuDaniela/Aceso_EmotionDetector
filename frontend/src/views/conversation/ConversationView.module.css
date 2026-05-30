@@ -414,3 +414,53 @@
   height: 32px;
   object-fit: contain;
 }
+
+@media (max-width: 768px) {
+  .root {
+    left: 0;
+    top: 0;
+  }
+ 
+  .chatWrapper {
+    padding: 16px 16px 0;
+    height: 100%;
+  }
+ 
+  .motto {
+    font-size: 11px;
+    padding: 2px 0 6px;
+  }
+ 
+  .userBubble {
+    max-width: 85%;
+    font-size: 13px;
+  }
+ 
+  .assistantCard {
+    max-width: 90%;
+  }
+ 
+  .charSlotEmpty {
+    width: 48px;
+  }
+ 
+  .charBtn {
+    width: 48px;
+    height: 70px;
+  }
+ 
+  .charBtn img {
+    width: 40px;
+    height: 40px;
+  }
+ 
+  .textarea {
+    height: 70px;
+    font-size: 13px;
+  }
+ 
+  .inputArea {
+    padding-bottom: 4px;
+  }
+}
+ 

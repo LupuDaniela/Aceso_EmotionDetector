@@ -156,3 +156,17 @@
 }
 
 .achEmptyHint strong { color: var(--accent, #8B6EC5); }
+
+@media (max-width: 768px) {
+  .root {
+    max-width: 100%;
+    gap: 16px;
+  }
+ 
+  .title { font-size: 20px; }
+ 
+  .calendarCard { padding: 12px; }
+ 
+  .achCard { padding: 12px; }
+}
+ 

@@ -59,3 +59,31 @@
   flex-direction: column;
   overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    height: 100dvh;
+  }
+ 
+  .main {
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+ 
+  .content {
+    width: 100%;
+    flex: 1;
+    padding: 16px 16px 80px;
+  }
+ 
+  .rightPanel {
+    display: none;
+  }
+ 
+  .sceneNormal,
+  .sceneBlurred {
+    display: none;
+  }
+}
