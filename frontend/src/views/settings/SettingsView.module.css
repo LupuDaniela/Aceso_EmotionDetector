@@ -206,3 +206,23 @@
   font-size: 12px;
   line-height: 1;
 }
+
+@media (max-width: 768px) {
+  .profileActions {
+    flex-direction: column;
+  }
+ 
+  .btnChangePass {
+    white-space: normal;
+    text-align: center;
+  }
+ 
+  .themeBtnPreview {
+    width: 60px;
+    height: 36px;
+  }
+ 
+  .themeBtn {
+    padding: 8px 10px;
+  }
+}

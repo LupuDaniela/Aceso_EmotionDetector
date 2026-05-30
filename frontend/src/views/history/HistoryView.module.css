@@ -93,3 +93,11 @@
   font-weight: 500;
   margin: 0;
 }
+
+@media (max-width: 768px) {
+  .root { max-width: 100%; }
+  .title { font-size: 18px; margin-bottom: 12px; }
+  .card { padding: 12px 14px; }
+  .cardTop { flex-direction: column; gap: 6px; }
+  .date { align-self: flex-end; }
+}

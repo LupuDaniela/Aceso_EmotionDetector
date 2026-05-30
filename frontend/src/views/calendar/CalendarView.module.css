@@ -14,3 +14,9 @@
   box-shadow: 0 2px 16px rgba(139, 110, 197, 0.10);
   border: 1px solid rgba(139, 110, 197, 0.08);
 }
+
+@media (max-width: 768px) {
+  .root { max-width: 100%; }
+  .title { font-size: 18px; margin-bottom: 12px; }
+  .card { padding: 12px; }
+}
